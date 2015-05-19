@@ -141,9 +141,10 @@ int main()
 
 #undef main
 #define main military_main
+#endif
+
 #include "military.c"
 #include "remaining.c"
-#endif
 
 /*
  * Local Variables:

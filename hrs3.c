@@ -155,8 +155,9 @@ int hrs3_main()
 
 #undef main
 #define main daily_main
-#include "daily.c"
 #endif
+
+#include "daily.c"
 
 /*
  * Local Variables:
