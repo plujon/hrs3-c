@@ -143,7 +143,7 @@ int test_hrs3_remaining_out()
   return 0;
 }
 
-int main()
+int hrs3_main()
 {
   int daily_main();
   return test_hrs3_kind() +
@@ -160,6 +160,6 @@ int main()
 
 /*
  * Local Variables:
- * compile-command: "gcc -Wall -DTEST -g -o hrs3 hrs3.c && ./hrs3"
+ * compile-command: "gcc -Wall -DTEST -Dhrs3_main=main -g -o hrs3 hrs3.c && ./hrs3"
  * End:
  */

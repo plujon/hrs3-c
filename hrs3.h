@@ -6,4 +6,8 @@
 int hrs3_remaining_in(const char *s, time_t time);
 int hrs3_remaining_out(const char *s, time_t time);
 
+#if TEST
+int hrs3_main();
+#endif
+
 #endif /* __hrs3_h__ */
