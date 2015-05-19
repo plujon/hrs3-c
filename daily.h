@@ -3,6 +3,6 @@
 
 #include "remaining.h"
 
-a_remaining_result hrs3_daily_remaining(const char *s, time_t t);
+a_remaining_result hrs3_daily_remaining(const char *s, struct tm *t);
 
 #endif /* __daily_h__ */

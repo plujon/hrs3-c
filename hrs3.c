@@ -54,9 +54,11 @@ static an_hrs3_kind hrs3_kind(const char *s)
 static a_remaining_result hrs3_remaining(const char *s, time_t t)
 {
   an_hrs3_kind kind = hrs3_kind(s);
+  struct tm ymdhms;
+  localtime_r(&t, &ymdhms);
   switch (kind) {
   case Invalid: return remaining_invalid();
-  case Daily: return hrs3_daily_remaining(s, t);
+  case Daily: return hrs3_daily_remaining(s, &ymdhms);
   default: break;
   }
   return remaining_invalid();

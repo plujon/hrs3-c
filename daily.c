@@ -15,14 +15,12 @@
  * "0800-1200&1300-1600&1700-1730"
  */
 
-a_remaining_result hrs3_daily_remaining(const char *s, time_t t)
+a_remaining_result hrs3_daily_remaining(const char *s, struct tm *t)
 {
-  if (!s || !*s)
+  if (!s || !*s || !ymdhms)
     return remaining_invalid();
-  struct tm ymdhms;
-  localtime_r(&t, &ymdhms);
-  a_military_time mt = { ymdhms.tm_hour, ymdhms.tm_min };
-  int tm_sec = ymdhms.tm_sec;
+  a_military_time mt = { t->tm_hour, t->tm_min };
+  int tm_sec = t->tm_sec;
   const char *p = s;
   a_military_time first_shift = { 24, 0 };
   while (p[0]) {
@@ -88,19 +86,18 @@ int test_hrs3_daily()
   struct tm ymdhms;
   time_t t = time(0);
   localtime_r(&t, &ymdhms);
-#define X(x, h, m, s, is_in_schedule, secs)                  \
-  do {                                                       \
-    ymdhms.tm_hour = h;                                      \
-    ymdhms.tm_min = m;                                       \
-    ymdhms.tm_sec = s;                                       \
-    t = mktime(&ymdhms);                                     \
-    a_remaining_result result = hrs3_daily_remaining(x, t);  \
-    if (!result.is_valid)                                    \
-      TFAIL();                                               \
-    if (is_in_schedule != result.time_is_in_schedule)        \
-      TFAIL();                                               \
-    if (secs != result.seconds)                              \
-      TFAIL();                                               \
+#define X(x, h, m, s, is_in_schedule, secs)                             \
+  do {                                                                  \
+    ymdhms.tm_hour = h;                                                 \
+    ymdhms.tm_min = m;                                                  \
+    ymdhms.tm_sec = s;                                                  \
+    a_remaining_result result = hrs3_daily_remaining(x, &ymdhms);       \
+    if (!result.is_valid)                                               \
+      TFAIL();                                                          \
+    if (is_in_schedule != result.time_is_in_schedule)                   \
+      TFAIL();                                                          \
+    if (secs != result.seconds)                                         \
+      TFAIL();                                                          \
   } while(0)
   X("830-12",  7,  0,  0, 0, 60 * 90);
   X("830-12",  7,  0,  1, 0, 60 * 90 - 1);
