@@ -15,7 +15,7 @@
  * "0800-1200&1300-1600&1700-1730"
  */
 
-a_remaining_result hrs3_daily_remaining(const char *s, struct tm *t)
+a_remaining_result daily_remaining(const char *s, struct tm *t)
 {
   if (!s || !*s || !ymdhms)
     return remaining_invalid();
@@ -81,7 +81,7 @@ a_remaining_result hrs3_daily_remaining(const char *s, struct tm *t)
 
 #if TEST
 #include "test.h"
-int test_hrs3_daily()
+int test_daily()
 {
   struct tm ymdhms;
   time_t t = time(0);
@@ -91,7 +91,7 @@ int test_hrs3_daily()
     ymdhms.tm_hour = h;                                                 \
     ymdhms.tm_min = m;                                                  \
     ymdhms.tm_sec = s;                                                  \
-    a_remaining_result result = hrs3_daily_remaining(x, &ymdhms);       \
+    a_remaining_result result = daily_remaining(x, &ymdhms);            \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
     if (is_in_schedule != result.time_is_in_schedule)                   \
@@ -133,7 +133,7 @@ int test_hrs3_daily()
 int main()
 {
   int military_main();
-  return test_hrs3_daily() + military_main();
+  return test_daily() + military_main();
 }
 
 #undef main

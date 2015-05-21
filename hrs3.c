@@ -58,7 +58,7 @@ static a_remaining_result hrs3_remaining(const char *s, time_t t)
   localtime_r(&t, &ymdhms);
   switch (kind) {
   case Invalid: return remaining_invalid();
-  case Daily: return hrs3_daily_remaining(s, &ymdhms);
+  case Daily: return daily_remaining(s, &ymdhms);
   default: break;
   }
   return remaining_invalid();
