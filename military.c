@@ -1,3 +1,6 @@
+#ifndef __military_c__
+#define __military_c__
+
 #include "military.h"
 #include <ctype.h>
 #include <string.h>
@@ -252,3 +255,6 @@ int main()
  * compile-command: "gcc -Wall -DTEST -g -o military military.c && ./military"
  * End:
  */
+
+#endif /* __military_c__ */
+
