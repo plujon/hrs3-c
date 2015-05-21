@@ -34,3 +34,31 @@ or not it occurs during the relevant schedule.
     } else {
       /* The time 'now' falls within MWF10-12. */
     }
+
+## Canonical representation
+
+Every hrs3 string can be converted to a canonical representation with
+the same meaning.  A canonical representation:
+
+1. has no overlapping or abutting shifts, except shifts that abut at
+   midnight.  So, "10-12&13-14" and "M23-24&T0-1" are canonical, and
+   "10-12&11-13" and "10-12&12-13" are not.
+
+2. is as chronologically ordered as possible.  When grouping
+   designators are used, such as "MWF", the earliest chronological
+   designator shall control the relative ordering with other similar
+   groupings in the same hrs3.  So, "MWF10-12.T8-9" is canonical, and
+   "T8-9.MWF10-12" is not.
+
+3. does not contain repetitions of the same day designator.  So,
+   "M10-12&13-15.WF10-12" is canonical, and "MWF10-12.M13-15" is not.
+
+4. uses the shortest means to express the schedule while observing the
+   above restrictions. The shortest equivalent unambiguous string is
+   canonical.  When two or more alternative representations have the
+   same length, the representation with fewest highens shall be
+   canonical.  So, "10-12" is canonical and "1000-1200" is not.
+
+Canonical representations should be used whenever possible because
+they can be used for equality comparison, and many implementations
+convert to canonical representation internally.
