@@ -1,7 +1,7 @@
 #ifndef __hrs3_c__
 #define __hrs3_c__
 
-#include "impl.h"
+#include "impl/impl.h"
 #include <string.h>
 
 typedef enum an_hrs3_kind {
@@ -162,14 +162,14 @@ void __attribute__((constructor)) test_hrs3()
 #endif /* RUN_TESTS */
 
 #ifdef ONE_OBJ
-#include "daily.c"
-#include "main.c"
-#include "military.c"
-#include "remaining.c"
-#include "time_range.c"
-#include "tm_time.c"
-#include "util.c"
-#include "weekly.c"
+#include "impl/daily.c"
+#include "impl/main.c"
+#include "impl/military.c"
+#include "impl/remaining.c"
+#include "impl/time_range.c"
+#include "impl/tm_time.c"
+#include "impl/util.c"
+#include "impl/weekly.c"
 #endif
 
 /*
