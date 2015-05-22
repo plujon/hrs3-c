@@ -1,5 +1,7 @@
-#include "hrs3.h"
-#include "daily.h"
+#ifndef __hrs3_c__
+#define __hrs3_c__
+
+#include "impl.h"
 #include <string.h>
 
 typedef enum an_hrs3_kind {
@@ -51,14 +53,21 @@ static an_hrs3_kind hrs3_kind(const char *s)
  * valid.  A return value of -1 indicates an error.  Otherwise, the
  * high bit of x indicates (a), and all other bits indicate (b).
  */
-static a_remaining_result hrs3_remaining(const char *s, time_t t)
+static a_remaining_result hrs3_remaining(const char *s, time_t time)
 {
   an_hrs3_kind kind = hrs3_kind(s);
+  a_time t;
+  ttime_init(&t, time);
   struct tm ymdhms;
-  localtime_r(&t, &ymdhms);
+  localtime_r(&time, &ymdhms);
   switch (kind) {
   case Invalid: return remaining_invalid();
-  case Daily: return daily_remaining(s, &ymdhms);
+  case Daily: return daily_remaining(s, &t);
+  case Weekly: return weekly_remaining(s, &t);
+#if 0
+  case Weekdaily: return weekdaily_remaining(s, &t);
+  case Biweekly: return biweekly_remaining(s, &ymdhms);
+#endif
   default: break;
   }
   return remaining_invalid();
@@ -66,7 +75,6 @@ static a_remaining_result hrs3_remaining(const char *s, time_t t)
 
 int hrs3_remaining_in(const char *s, time_t t)
 {
-  /* TODO - canonicalize s (guarantee order and short form) */
   a_remaining_result result = hrs3_remaining(s, t);
   if (!result.is_valid)
     return -1;
@@ -77,7 +85,6 @@ int hrs3_remaining_in(const char *s, time_t t)
 
 int hrs3_remaining_out(const char *s, time_t t)
 {
-  /* TODO - canonicalize s (guarantee order and short form) */
   a_remaining_result result = hrs3_remaining(s, t);
   if (!result.is_valid)
     return -1;
@@ -86,8 +93,7 @@ int hrs3_remaining_out(const char *s, time_t t)
   return result.seconds;
 }
 
-#if TEST
-#include "test.h"
+#if RUN_TESTS
 int test_hrs3_kind()
 {
 #define X(x) if (!(x)) TFAIL();
@@ -147,24 +153,29 @@ int test_hrs3_remaining_out()
   return 0;
 }
 
-int hrs3_main()
+void __attribute__((constructor)) test_hrs3()
 {
-  int daily_main();
-  return test_hrs3_kind() +
-    test_hrs3_remaining_in() +
-    test_hrs3_remaining_out() +
-    daily_main() +
-    0;
+  test_hrs3_kind();
+  test_hrs3_remaining_in();
+  test_hrs3_remaining_out();
 }
+#endif /* RUN_TESTS */
 
-#undef main
-#define main daily_main
-#endif
-
+#ifdef ONE_OBJ
 #include "daily.c"
+#include "main.c"
+#include "military.c"
+#include "remaining.c"
+#include "time_range.c"
+#include "tm_time.c"
+#include "util.c"
+#include "weekly.c"
+#endif
 
 /*
  * Local Variables:
- * compile-command: "gcc -Wall -DTEST -Dhrs3_main=main -g -o hrs3 hrs3.c && ./hrs3"
+ * compile-command: "gcc -Wall -DTEST -g -o hrs3 hrs3.c && ./hrs3"
  * End:
  */
+
+#endif /* __hrs3_c__ */
