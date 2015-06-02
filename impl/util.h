@@ -3,8 +3,10 @@
 
 #include "time.h"
 
-a_time beginning_of_day(a_time *t);
-a_time beginning_of_week(a_time *t);
+a_time beginning_of_day(const a_time *t);
+a_time beginning_of_week(const a_time *t);
+void dd_to_s(char *buffer, int decimal);
+int s_to_d(const char *s, size_t len);
 char *strnchr(const char *s, size_t len, char c);
 
 #endif /* __util_h__ */

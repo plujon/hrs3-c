@@ -3,7 +3,7 @@
 
 #include "remaining.h"
 #include "military.h"
-#include "tm_time.h"
+#include "thyme.h"
 
 typedef struct a_day {
   int capacity;

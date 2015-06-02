@@ -10,26 +10,26 @@ a_time_range time_range_empty()
   return x;
 }
 
-bool time_range_contains(a_time_range *range, a_time *t)
+bool time_range_contains(a_time_range *range, const a_time *t)
 {
-  bool x = ttime_cmp(&range->start, t) <= 0;
-  bool y = ttime_cmp(t, &range->stop) < 0;
+  bool x = thyme_cmp(&range->start, t) <= 0;
+  bool y = thyme_cmp(t, &range->stop) < 0;
   return x && y;
 }
 
 bool time_range_overlap_or_abut(a_time_range *a, a_time_range *b)
 {
-  a_time *start = ttime_max(&a->start, &b->start);
-  a_time *stop = ttime_min(&a->stop, &b->stop);
-  return (0 <= ttime_diff(stop, start)) ? true : false;
+  a_time *start = thyme_max(&a->start, &b->start);
+  a_time *stop = thyme_min(&a->stop, &b->stop);
+  return (0 <= thyme_diff(stop, start)) ? true : false;
 }
 
 a_time_range *time_range_overlap_alloc(a_time_range *range,
                                        a_time_range *during)
 {
-  a_time *start = ttime_max(&range->start, &during->start);
-  a_time *stop = ttime_min(&range->stop, &during->stop);
-  if (ttime_diff(stop, start) <= 0)
+  a_time *start = thyme_max(&range->start, &during->start);
+  a_time *stop = thyme_min(&range->stop, &during->stop);
+  if (thyme_diff(stop, start) <= 0)
     return 0;
   a_time_range *ret = malloc(sizeof(a_time_range));
   memcpy(&ret->start, start, sizeof(a_time));
@@ -37,46 +37,38 @@ a_time_range *time_range_overlap_alloc(a_time_range *range,
   return ret;
 }
 
-void time_range_init_tm(a_time_range *range, struct tm *tm, int seconds)
+void time_range_init(a_time_range *range, const a_time *start, int seconds)
 {
-  time_t time = mktime(tm);
-  time_range_init_time(range, time, seconds);
-}
-
-void time_range_init_time(a_time_range *range, time_t time, int seconds)
-{
-  ttime_init(&range->start, time);
+  thyme_copy(&range->start, start);
 #if CHECK
   if (seconds < 0) {
     BUG();
   }
 #endif
-  ttime_init(&range->stop, time + seconds);
+  thyme_copy(&range->stop, start);
+  thyme_incr(&range->stop, seconds);
 }
 
 #if RUN_TESTS
-int test_time_range_init()
+void test_time_range_init()
 {
-  time_t now = time(0);
   a_time_range range;
-  time_range_init_time(&range, now, 10);
-  return 0;
+  time_range_init(&range, thyme_now(), 10);
 }
 
-int test_time_range_contains()
+void test_time_range_contains()
 {
-  a_time start = time_now();
-  a_time prior = time_now(); time_incr(&prior, -10);
-  a_time late  = time_now(); time_incr(&late,    9);
-  a_time stop  = time_now(); time_incr(&stop,  10);
-  a_time after = time_now(); time_incr(&after,  20);
+  const a_time *start = thyme_now();
+  a_time prior = thyme_clone(start); thyme_incr(&prior, -10);
+  a_time late  = thyme_clone(start); thyme_incr(&late,    9);
+  a_time stop  = thyme_clone(start); thyme_incr(&stop,  10);
+  a_time after = thyme_clone(start); thyme_incr(&after,  20);
   a_time_range range;
-  time_range_init_time(&range, ttime_time(&start), 10);
+  time_range_init(&range, start, 10);
   if ( time_range_contains(&range, &prior)) TFAIL();
-  if (!time_range_contains(&range, &start)) TFAIL();
+  if (!time_range_contains(&range, start)) TFAIL();
   if ( time_range_contains(&range, &stop)) TFAIL();
   if ( time_range_contains(&range, &after)) TFAIL();
-  return 0;
 }
 
 void __attribute__((constructor)) test_time_range()
@@ -87,7 +79,7 @@ void __attribute__((constructor)) test_time_range()
 #endif /* RUN_TESTS */
 
 #if ONE_OBJ
-#include "tm_time.c"
+#include "thyme.c"
 #include "main.c"
 #endif
 

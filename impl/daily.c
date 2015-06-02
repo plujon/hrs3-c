@@ -191,7 +191,7 @@ a_remaining_result daily_remaining(const char *s, a_time *t)
     BUG();
 #endif
   a_time anchor = beginning_of_day(t);
-  int target_seconds = ttime_diff(t, &anchor);
+  int target_seconds = thyme_diff(t, &anchor);
   int seconds = 0;
   int is_in_schedule = 0;
   a_military_time midnight = military_midnight();
@@ -226,17 +226,10 @@ a_remaining_result daily_remaining(const char *s, a_time *t)
 #if RUN_TESTS
 void test_day_parse()
 {
-  time_t tim = time(0);
-  a_time ti;
-  ttime_init(&ti, tim);
-  struct tm *ymdhms = ttime_tm(&ti);
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    ymdhms->tm_hour = h;                                                \
-    ymdhms->tm_min = m;                                                 \
-    ymdhms->tm_sec = s;                                                 \
     a_time t;                                                           \
-    ttime_init_tm(&t, ymdhms);                                          \
+    thyme_hms(&t, h, m, s);                                             \
     a_remaining_result result = daily_remaining(x, &t);                 \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
@@ -278,17 +271,10 @@ void test_day_merge()
 
 void test_daily_remaining()
 {
-  time_t tim = time(0);
-  a_time ti;
-  ttime_init(&ti, tim);
-  struct tm *ymdhms = ttime_tm(&ti);
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    ymdhms->tm_hour = h;                                                \
-    ymdhms->tm_min = m;                                                 \
-    ymdhms->tm_sec = s;                                                 \
     a_time t;                                                           \
-    ttime_init_tm(&t, ymdhms);                                          \
+    thyme_hms(&t, h, m, s);                                             \
     a_remaining_result result = daily_remaining(x, &t);                 \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
@@ -339,7 +325,7 @@ void __attribute__((constructor)) test_daily()
 #include "main.c"
 #include "military.c"
 #include "remaining.c"
-#include "tm_time.c"
+#include "thyme.c"
 #include "util.c"
 #endif
 

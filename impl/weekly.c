@@ -137,7 +137,7 @@ a_time_range week_find_lowerbound(a_week *week, a_time *target)
   a_time_range ret;
   a_time anchor = beginning_of_week(target);
   a_military_time midnight = military_midnight();
-  int target_seconds_into_week = ttime_diff(target, &anchor);
+  int target_seconds_into_week = thyme_diff(target, &anchor);
   size_t i = 0;
   for (; i < DIM(week->days) + 1; ++i) {
     a_day *day = &week->days[i % 7];
@@ -155,9 +155,9 @@ a_time_range week_find_lowerbound(a_week *week, a_time *target)
       int stop_second = military_time_diff(&range->stop, &midnight);
       if (target_second < stop_second) {
         /* bingo */
-        time_t end_of_range = ttime_time(&anchor) + day_seconds + stop_second;
         int sec = military_range_in_seconds(range);
-        time_range_init_time(&ret, end_of_range - sec, sec);
+        thyme_incr(&anchor, day_seconds + stop_second - sec);
+        time_range_init(&ret, &anchor, sec);
         return ret;
       }
     }
@@ -184,14 +184,14 @@ a_remaining_result weekly_remaining(const char *s, a_time *t)
   a_time_range range = week_find_lowerbound(&week, t);
   bool is_in_range = time_range_contains(&range, t);
   int seconds = is_in_range ?
-    ttime_diff(&range.stop, t) :
-    ttime_diff(&range.start, t);
+    thyme_diff(&range.stop, t) :
+    thyme_diff(&range.start, t);
   a_remaining_result result = { 1, is_in_range, seconds };
   return result;
 }
 
 #if RUN_TESTS
-static int test_gobble_days()
+static void test_gobble_days()
 {
 #define X(S, LEN, MASK) do {                            \
     a_day_mask mask;                                    \
@@ -203,7 +203,6 @@ static int test_gobble_days()
   X("UU1-2", 2, SUNDAY);
   X("AUMTWRF1-2", 7, SUNDAY | MONDAY | TUESDAY | WEDNESDAY | THURSDAY | FRIDAY | SATURDAY );
 #undef X
-  return 0;
 }
 
 static int thwr_aux(const char *hrs3,
@@ -211,15 +210,15 @@ static int thwr_aux(const char *hrs3,
                     int is_valid, int time_is_in_schedule, int seconds)
 {
   a_remaining_result expected = { is_valid, time_is_in_schedule, seconds };
-  a_time t = time_now();
-  time_whms(&t, wday, hour, minute, second);
+  a_time t = thyme_clone(thyme_now());
+  thyme_whms(&t, wday, hour, minute, second);
   a_remaining_result result = weekly_remaining(hrs3, &t);
   return (expected.is_valid == result.is_valid &&
           expected.time_is_in_schedule == result.time_is_in_schedule &&
           expected.seconds == result.seconds) ? 0 : 1;
 }
 
-static int test_weekly_remaining()
+static void test_weekly_remaining()
 {
 #define IN(hrs3, wday, h, m, s, seconds)                        \
   if (thwr_aux(hrs3, wday, h, m, s, 1, 1, seconds)) TFAIL()
@@ -250,7 +249,7 @@ static int test_weekly_remaining()
   OUT("U1-2&3-4.M6-7&8-9",    1,  9,  0,  0, 3600 * 24 * 6 - 3600 * 8);
 #undef OUT
 #define BAD(hrs3) do {                                                  \
-    a_time t = time_now();                                              \
+    a_time t = thyme_clone(thyme_now());                                \
     a_remaining_result result = weekly_remaining(hrs3, &t);             \
     if (result.is_valid) TFAIL();                                       \
   } while(0)
@@ -260,7 +259,6 @@ static int test_weekly_remaining()
   BAD("U13-12");
   BAD("X1-2");
 #undef BAD
-  return 0;
 }
 
 void __attribute__((constructor)) test_weekly()

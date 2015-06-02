@@ -24,12 +24,16 @@ static an_hrs3_kind hrs3_kind(const char *s)
   if ('0' <= c && c <= '9') {
     /*
      * This is either a raw schedule such as
-     * 20150516120100-20150516120200 or a daily schedule such as
-     * 2015-2215 (8:15pm to 10:15pm) or
-     * 20-21 (8pm to 9pm) or
-     * 2000-21 (8pm to 9pm) or
-     * 20-2100 (8pm to 9pm).
+     *  201505161201-201505161202 or
+     *  20150516120100-20150516120200 or
+     * a daily schedule such as
+     *  2015-2215 (8:15pm to 10:15pm) or
+     *  20-21 (8pm to 9pm) or
+     *  2000-21 (8pm to 9pm) or
+     *  20-2100 (8pm to 9pm).
      */
+    if (dash - s == 12)
+      return Raw;
     if (dash - s == 14)
       return Raw;
     else if (dash - s <= 4)
@@ -43,6 +47,8 @@ static an_hrs3_kind hrs3_kind(const char *s)
     return Weekly;
   if ('B' ==  c)
     return Biweekly;
+  if ('_' ==  c)
+    return Raw;
   return Invalid;
 }
 
@@ -57,13 +63,14 @@ static a_remaining_result hrs3_remaining(const char *s, time_t time)
 {
   an_hrs3_kind kind = hrs3_kind(s);
   a_time t;
-  ttime_init(&t, time);
+  thyme_init(&t, time);
   struct tm ymdhms;
   localtime_r(&time, &ymdhms);
   switch (kind) {
   case Invalid: return remaining_invalid();
   case Daily: return daily_remaining(s, &t);
   case Weekly: return weekly_remaining(s, &t);
+  case Raw: return raw_remaining(s, &t);
 #if 0
   case Weekdaily: return weekdaily_remaining(s, &t);
   case Biweekly: return biweekly_remaining(s, &ymdhms);
@@ -104,6 +111,8 @@ int test_hrs3_kind()
   X(Weekly == hrs3_kind("MWF8-12"));
   X(Biweekly == hrs3_kind("BM8-12|T8-12"));
   X(Raw == hrs3_kind("20150516121900-20150516122000"));
+  X(Raw == hrs3_kind("_20150516121900-20150516122000"));
+  X(Raw == hrs3_kind("_1900-2100"));
 #undef X
   return 0;
 }
@@ -162,14 +171,7 @@ void __attribute__((constructor)) test_hrs3()
 #endif /* RUN_TESTS */
 
 #ifdef ONE_OBJ
-#include "impl/daily.c"
-#include "impl/main.c"
-#include "impl/military.c"
-#include "impl/remaining.c"
-#include "impl/time_range.c"
-#include "impl/tm_time.c"
-#include "impl/util.c"
-#include "impl/weekly.c"
+#include "impl/impl.c"
 #endif
 
 /*

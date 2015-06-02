@@ -3,27 +3,44 @@
 
 #include "impl.h"
 
-a_time beginning_of_day(a_time *t)
+a_time beginning_of_day(const a_time *t)
 {
   a_time ret;
-  struct tm *tm = ttime_tm(t);
-  int seconds_into_day = tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
-  time_t time = ttime_time(t);
-  time -= seconds_into_day;
-  ttime_init(&ret, time);
+  thyme_copy(&ret, t);
+  thyme_hms(&ret, 0, 0, 0);
   return ret;
 }
 
-a_time beginning_of_week(a_time *t)
+a_time beginning_of_week(const a_time *t)
 {
   a_time ret;
-  struct tm *tm = ttime_tm(t);
-  int seconds_into_week = tm->tm_wday * 3600 * 24 +
-    tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
-  time_t time = ttime_time(t);
-  time -= seconds_into_week;
-  ttime_init(&ret, time);
+  thyme_copy(&ret, t);
+  thyme_whms(&ret, 0, 0, 0, 0);
   return ret;
+}
+
+int c_to_d(char c)
+{
+  if ('0' <= c && c <= '9')
+    return c - '0';
+  return 0;
+}
+
+int s_to_d(const char *s, size_t len)
+{
+  int ret = 0;
+  const char *end = s + len;
+  for(; s < end; ++s) {
+    ret *= 10;
+    ret += c_to_d(*s);
+  }
+  return ret;
+}
+
+void dd_to_s(char *buffer, int value)
+{
+  buffer[0] = '0' + value / 10;
+  buffer[1] = '0' + value % 10;
 }
 
 char *strnchr(const char *s, size_t len, char c)
@@ -37,29 +54,25 @@ char *strnchr(const char *s, size_t len, char c)
 }
 
 #if RUN_TESTS
-int test_beginning_of_day()
+void test_beginning_of_day()
 {
-  a_time now = time_now();
-  a_time t = beginning_of_day(&now);
-  struct tm *tm = ttime_tm(&t);
-  struct tm *now_tm = ttime_tm(&now);
+  a_time t = beginning_of_day(thyme_now());
+  const struct tm *tm = thyme_tm(&t);
+  const struct tm *now_tm = thyme_tm(thyme_now());
   if (tm->tm_hour) TFAIL();
   if (tm->tm_min) TFAIL();
   if (tm->tm_sec) TFAIL();
   if (tm->tm_wday != now_tm->tm_wday) TFAIL();
-  return 0;
 }
 
-int test_beginning_of_week()
+void test_beginning_of_week()
 {
-  a_time now = time_now();
-  a_time t = beginning_of_week(&now);
-  struct tm *tm = ttime_tm(&t);
+  a_time t = beginning_of_week(thyme_now());
+  const const struct tm *tm = thyme_tm(&t);
   if (tm->tm_wday) TFAIL();
   if (tm->tm_hour) TFAIL();
   if (tm->tm_min) TFAIL();
   if (tm->tm_sec) TFAIL();
-  return 0;
 }
 
 void __attribute__((constructor)) test_util()
@@ -69,7 +82,7 @@ void __attribute__((constructor)) test_util()
 }
 
 #if ONE_OBJ
-#include "tm_time.c"
+#include "thyme.c"
 #include "main.c"
 #endif
 
