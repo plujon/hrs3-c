@@ -24,7 +24,6 @@ static an_hrs3_kind hrs3_kind(const char *s)
   if ('0' <= c && c <= '9') {
     /*
      * This is either a raw schedule such as
-     *  201505161201-201505161202 or
      *  20150516120100-20150516120200 or
      * a daily schedule such as
      *  2015-2215 (8:15pm to 10:15pm) or
@@ -32,8 +31,6 @@ static an_hrs3_kind hrs3_kind(const char *s)
      *  2000-21 (8pm to 9pm) or
      *  20-2100 (8pm to 9pm).
      */
-    if (dash - s == 12)
-      return Raw;
     if (dash - s == 14)
       return Raw;
     else if (dash - s <= 4)

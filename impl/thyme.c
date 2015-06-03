@@ -178,10 +178,15 @@ int days_in_mon(int nmon, int nyear)
   return 0;
 }
 
+size_t thyme_string_length()
+{
+  return sizeof("CCYYMMDDHHMMSS") - 1; /* 14 */
+}
+
 status thyme_parse(const char *s, size_t len, a_time *out)
 {
   memset(out, 0, sizeof(a_time));
-  if (len < 4 /* year */ + 2 /* mon */ + 2 /* day */ + 2 /* hour */ + 2 /* min */) {
+  if (len < thyme_string_length()) {
     return __LINE__;
   }
   int year = s_to_d(s, 4); s += 4;
@@ -193,7 +198,7 @@ status thyme_parse(const char *s, size_t len, a_time *out)
   if (hour < 0 || 24 <= hour) return __LINE__;
   int minute = s_to_d(s, 2); s += 2;
   if (minute < 0 || 60 <= minute) return __LINE__;
-  int second = 0;
+  int second = s_to_d(s, 2); s += 2;
   thyme_copy(out, thyme_now());
   thyme_ymdhms(out, year, mon, day, hour, minute, second);
   return OK;
@@ -209,7 +214,8 @@ size_t thyme_to_s(char *buffer, const a_time *t)
   dd_to_s(&buffer[6], tm->tm_mday);
   dd_to_s(&buffer[8], tm->tm_hour);
   dd_to_s(&buffer[10], tm->tm_min);
-  return 12;
+  dd_to_s(&buffer[12], tm->tm_sec);
+  return 14;
 }
 
 const a_time *thyme_now()
