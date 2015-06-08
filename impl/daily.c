@@ -228,7 +228,7 @@ void test_day_parse()
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    a_time t;                                                           \
+    a_time t = *thyme_now();                                            \
     thyme_hms(&t, h, m, s);                                             \
     a_remaining_result result = daily_remaining(x, &t);                 \
     if (!result.is_valid)                                               \
@@ -273,7 +273,7 @@ void test_daily_remaining()
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    a_time t;                                                           \
+    a_time t = *thyme_now();                                            \
     thyme_hms(&t, h, m, s);                                             \
     a_remaining_result result = daily_remaining(x, &t);                 \
     if (!result.is_valid)                                               \
