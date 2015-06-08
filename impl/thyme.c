@@ -78,10 +78,8 @@ a_time *thyme_max(const a_time *a, const a_time *b)
 
 void thyme_init(a_time *t, time_t time)
 {
-  if (t->time != time) {
-    t->time = time;
-    memset(&t->tm, 0, sizeof(struct tm));
-  }
+  t->time = time;
+  memset(&t->tm, 0, sizeof(struct tm));
 }
 
 void thyme_s(a_time *t, int sec)
