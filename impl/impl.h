@@ -2,10 +2,12 @@
 #define __impl_h__
 
 #include "base.h"
+#include "a_hrs3.h"
 #include "daily.h"
 #include "military.h"
 #include "raw.h"
 #include "remaining.h"
+#include "schedule.h"
 #include "test.h"
 #include "time_range.h"
 #include "thyme.h"

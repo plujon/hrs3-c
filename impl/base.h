@@ -23,6 +23,11 @@
 typedef int status;
 typedef int bool;
 
+struct a_day;
+struct a_schedule;
+struct a_time;
+struct a_time_range;
+
 #include <stddef.h>
 
 #endif /* __base_h__ */

@@ -1,7 +1,10 @@
+#include "a_hrs3.c"
 #include "daily.c"
+#include "main.c"
 #include "military.c"
 #include "raw.c"
 #include "remaining.c"
+#include "schedule.c"
 #include "time_range.c"
 #include "thyme.c"
 #include "util.c"
@@ -9,6 +12,6 @@
 
 /*
  * Local Variables:
- * compile-command: "gcc -Wall -g -o impl impl.c && ./impl"
+ * compile-command: "gcc -Wall -DTEST -g -o impl impl.c && ./impl"
  * End:
  */

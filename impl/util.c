@@ -54,6 +54,21 @@ char *strnchr(const char *s, size_t len, char c)
 }
 
 #if RUN_TESTS
+#include <string.h>
+
+void remove_char(char *s, char c)
+{
+  char *it = s;
+  char *end = s + strlen(s);
+  for (; it < end; ++it) {
+    if (c == *it) {
+      memmove(it, it + 1, end - it);
+    }
+  }
+}
+#endif
+
+#if RUN_TESTS
 void test_beginning_of_day()
 {
   a_time t = beginning_of_day(thyme_now());

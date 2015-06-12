@@ -9,4 +9,8 @@ void dd_to_s(char *buffer, int decimal);
 int s_to_d(const char *s, size_t len);
 char *strnchr(const char *s, size_t len, char c);
 
+#if RUN_TESTS
+void remove_char(char *s, char c);
+#endif
+
 #endif /* __util_h__ */

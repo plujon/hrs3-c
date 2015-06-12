@@ -171,66 +171,29 @@ char *day_to_s_dup(a_day *day)
   return strdup(buffer);
 }
 
-/*
- * Return (a) whether t is within s, and (b) the number of seconds
- * after t that the answer to (a) is guaranteed.  See hrs3_remaining.
- *
- * "8-12"
- * "0800-1200"
- * "0800-1200&1300-1600&1700-1730"
- */
-a_remaining_result daily_remaining(const char *s, a_time *t)
+void day_add_to_schedule(const a_day *day, const a_time *t, a_schedule *schedule)
 {
-  if (!s || !s[0] || !t)
-    return remaining_invalid();
-  a_day day;
-  if (OK != day_parse(s, strlen(s), &day))
-    return remaining_invalid();
-#if CHECK
-  if (0 == day.n_ranges)
-    BUG();
-#endif
-  a_time anchor = beginning_of_day(t);
-  int target_seconds = thyme_diff(t, &anchor);
-  int seconds = 0;
-  int is_in_schedule = 0;
-  a_military_time midnight = military_midnight();
   size_t i = 0;
-  for (; i < day.n_ranges; ++i) {
-    a_military_range *range = &day.ranges[i];
-    a_military_time *stop = &range->stop;
-    int stop_seconds = military_time_diff(stop, &midnight);
-    if (target_seconds < stop_seconds) {
-      int start_seconds = military_time_diff(&range->start, &midnight);
-      if (start_seconds <= target_seconds) {
-        is_in_schedule = 1;
-        seconds = stop_seconds - target_seconds;
-        break;
-      } else {
-        is_in_schedule = 0;
-        seconds = start_seconds - target_seconds;
-        break;
-      }
+  for (; i < day->n_ranges; ++i) {
+    a_military_range *range = &day->ranges[i];
+    a_time_range time_range_, *time_range = &time_range_;
+    if (military_range_to_time_range(range, t, time_range)) {
+      schedule_insert(schedule, time_range);
     }
   }
-  if (i == day.n_ranges) {
-    is_in_schedule = 0;
-    int rest_of_day = 3600 * 24 - target_seconds;
-    seconds = rest_of_day + military_time_diff(&day.ranges[0].start, &midnight);
-  }
-  day_destroy(&day);
-  a_remaining_result result = { 1, is_in_schedule, seconds };
-  return result;
 }
 
 #if RUN_TESTS
+
+static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time);
+
 void test_day_parse()
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
     a_time t = *thyme_now();                                            \
     thyme_hms(&t, h, m, s);                                             \
-    a_remaining_result result = daily_remaining(x, &t);                 \
+    a_remaining_result result = hrs3_remaining_(x, thyme_time(&t));     \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
     if (is_in_schedule != result.time_is_in_schedule)                   \
@@ -275,7 +238,7 @@ void test_daily_remaining()
   do {                                                                  \
     a_time t = *thyme_now();                                            \
     thyme_hms(&t, h, m, s);                                             \
-    a_remaining_result result = daily_remaining(x, &t);                 \
+    a_remaining_result result = hrs3_remaining_(x, thyme_time(&t));     \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
     if (is_in_schedule != result.time_is_in_schedule)                   \
@@ -325,8 +288,10 @@ void __attribute__((constructor)) test_daily()
 #include "main.c"
 #include "military.c"
 #include "remaining.c"
+#include "schedule.c"
 #include "thyme.c"
 #include "util.c"
+#include "../hrs3.c"
 #endif
 
 /*

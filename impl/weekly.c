@@ -107,12 +107,6 @@ status week_parse_single(const char *s, size_t len, a_week *week)
 }
 
 /* MWF10-12.T8-9 */
-size_t week_parse_(const char *buffer, a_week *week)
-{
-  size_t offset = 0;
-  return offset;
-}
-
 status week_parse(const char *s, size_t len, a_week *week)
 {
   const char *period = strnchr(s, len, '.');
@@ -132,62 +126,16 @@ status week_parse(const char *s, size_t len, a_week *week)
   return week_parse_single(s, len, week);
 }
 
-a_time_range week_find_lowerbound(a_week *week, a_time *target)
+void week_add_to_schedule(const a_week *week, const a_time *t, a_schedule *schedule)
 {
-  a_time_range ret;
-  a_time anchor = beginning_of_week(target);
-  a_military_time midnight = military_midnight();
-  int target_seconds_into_week = thyme_diff(target, &anchor);
+  a_time date_ = thyme_clone(t), *date = &date_;
   size_t i = 0;
-  for (; i < DIM(week->days) + 1; ++i) {
-    a_day *day = &week->days[i % 7];
-    if (0 == day->n_ranges)
-      continue;
-    int day_seconds = 3600 * 24 * i;
-    if (day_seconds + 3600 * 24 < target_seconds_into_week) {
-      /* skip this day */
-      continue;
-    }
-    int target_second = target_seconds_into_week - day_seconds;
-    size_t j = 0;
-    for (; j < day->n_ranges; ++j) {
-      a_military_range *range = &day->ranges[j];
-      int stop_second = military_time_diff(&range->stop, &midnight);
-      if (target_second < stop_second) {
-        /* bingo */
-        int sec = military_range_in_seconds(range);
-        thyme_incr(&anchor, day_seconds + stop_second - sec);
-        time_range_init(&ret, &anchor, sec);
-        return ret;
-      }
-    }
+  for (; i < DIM(week->days); ++i) {
+    const a_day *day = &week->days[i];
+    if (0 == day->n_ranges) continue;
+    thyme_whms(date, i, 0, 0, 0);
+    day_add_to_schedule(day, date, schedule);
   }
-  BUG();
-  return time_range_empty();
-}
-
-/*
- * Return (a) whether t is within s, and (b) the number of seconds
- * after t that the answer to (a) is guaranteed.  See hrs3_remaining.
- *
- * "M8-12"
- * "MWF8-12&13-15"
- * "MWF8-12&13-15.TR5-6"
- */
-a_remaining_result weekly_remaining(const char *s, a_time *t)
-{
-  if (!s || !s[0] || !t)
-    return remaining_invalid();
-  a_week week;
-  if (OK != week_parse(s, strlen(s), &week))
-    return remaining_invalid();
-  a_time_range range = week_find_lowerbound(&week, t);
-  bool is_in_range = time_range_contains(&range, t);
-  int seconds = is_in_range ?
-    thyme_diff(&range.stop, t) :
-    thyme_diff(&range.start, t);
-  a_remaining_result result = { 1, is_in_range, seconds };
-  return result;
 }
 
 #if RUN_TESTS
@@ -205,14 +153,16 @@ static void test_gobble_days()
 #undef X
 }
 
-static int thwr_aux(const char *hrs3,
+static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time);
+
+static int thwr_aux(const char *hrsss,
                     int wday, int hour, int minute, int second,
                     int is_valid, int time_is_in_schedule, int seconds)
 {
   a_remaining_result expected = { is_valid, time_is_in_schedule, seconds };
   a_time t = thyme_clone(thyme_now());
   thyme_whms(&t, wday, hour, minute, second);
-  a_remaining_result result = weekly_remaining(hrs3, &t);
+  a_remaining_result result = hrs3_remaining_(hrsss, thyme_time(&t));
   return (expected.is_valid == result.is_valid &&
           expected.time_is_in_schedule == result.time_is_in_schedule &&
           expected.seconds == result.seconds) ? 0 : 1;
@@ -220,8 +170,8 @@ static int thwr_aux(const char *hrs3,
 
 static void test_weekly_remaining()
 {
-#define IN(hrs3, wday, h, m, s, seconds)                        \
-  if (thwr_aux(hrs3, wday, h, m, s, 1, 1, seconds)) TFAIL()
+#define IN(hrsss, wday, h, m, s, seconds)                             \
+  if (thwr_aux(hrsss, wday, h, m, s, 1, 1, seconds)) TFAIL()
   IN("U8-9",                 0,  8,  0,  0,  3600);
   IN("U8-9",                 0,  8, 59, 59,     1);
   IN("UA6-7&8-9",            0,  6,  0,  0,  3600);
@@ -233,8 +183,8 @@ static void test_weekly_remaining()
   IN("U1-2&3-4.M6-7&8-9",    1,  6,  0,  0,  3600);
   IN("U1-2&3-4.M6-7&8-9",    1,  8,  0,  0,  3600);
 #undef IN
-#define OUT(hrs3, wday, h, m, s, seconds)                       \
-  if (thwr_aux(hrs3, wday, h, m, s, 1, 0, seconds)) TFAIL()
+#define OUT(hrsss, wday, h, m, s, seconds)                            \
+  if (thwr_aux(hrsss, wday, h, m, s, 1, 0, seconds)) TFAIL()
   OUT("U8-9",                 0,  7, 59, 59,     1);
   OUT("U8-9",                 0,  9,  0,  0, 6 * 24 * 3600 + 23 * 3600);
   OUT("U8-9",                 1,  8,  0,  0, 5 * 24 * 3600 + 24 * 3600);
@@ -248,9 +198,9 @@ static void test_weekly_remaining()
   OUT("U1-2&3-4.M6-7&8-9",    1,  7, 59, 59,     1);
   OUT("U1-2&3-4.M6-7&8-9",    1,  9,  0,  0, 3600 * 24 * 6 - 3600 * 8);
 #undef OUT
-#define BAD(hrs3) do {                                                  \
+#define BAD(hrsss) do {                                                 \
     a_time t = thyme_clone(thyme_now());                                \
-    a_remaining_result result = weekly_remaining(hrs3, &t);             \
+    a_remaining_result result = hrs3_remaining_(hrsss, thyme_time(&t)); \
     if (result.is_valid) TFAIL();                                       \
   } while(0)
   BAD("U");
@@ -271,6 +221,8 @@ void __attribute__((constructor)) test_weekly()
 #include "util.c"
 #include "time_range.c"
 #include "remaining.c"
+#include "schedule.c"
+#include "../hrs3.c"
 #endif
 
 /*

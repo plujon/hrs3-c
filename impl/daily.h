@@ -11,8 +11,7 @@ typedef struct a_day {
   a_military_range *ranges;
 } a_day;
 
-a_remaining_result daily_remaining(const char *s, a_time *t);
-
+void day_add_to_schedule(const a_day *, const a_time *time, struct a_schedule *schedule);
 status day_parse(const char *s, size_t len, a_day *day);
 void day_clone(a_day *dest, a_day *src);
 void day_copy(a_day *dest, a_day *src);

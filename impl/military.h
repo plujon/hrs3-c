@@ -15,6 +15,8 @@ a_military_time military_midnight();
 int military_time_cmp(a_military_time *a, a_military_time *b);
 int military_time_diff(a_military_time *later, a_military_time *prior);
 size_t military_time_to_s(char *buffer, a_military_time *time);
+bool military_time_to_time(const a_military_time *military_time, const struct a_time *date, struct a_time *t);
+bool military_range_to_time_range(const a_military_range *military_range, const struct a_time *date, struct a_time_range *time_range);
 status military_parse_time(const char *s, int len, a_military_time* time);
 int military_range_cmp(a_military_range *a, a_military_range *b);
 int military_range_in_seconds(a_military_range *range);

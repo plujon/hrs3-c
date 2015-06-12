@@ -165,6 +165,50 @@ status military_parse_range(const char *s, int len, a_military_range* range)
   return 0;
 }
 
+/*
+ * Calculate the time 't' that 'mil' would occur at on the date given
+ * by 'date'.  Any hour/minute/seconds in date are ignored.
+ */
+bool military_time_to_time_no_dst_adjust(const a_military_time *military_time,
+                                         const a_time *date,
+                                         a_time *t)
+{
+  a_time clone = thyme_clone(t);
+  thyme_copy(t, date);
+  if (thyme_hms(t, military_time->hour, military_time->minute, 0))
+    return true;
+  thyme_copy(t, &clone);
+  return false;
+} 
+
+bool military_time_to_time(const a_military_time *src,
+                           const a_time *date,
+                           a_time *t)
+{
+  if (military_time_to_time_no_dst_adjust(src, date, t))
+    return true;
+  if (2 != src->hour)
+    return false;
+  a_military_time three_am = { 3, 0 };
+  if (military_time_to_time_no_dst_adjust(&three_am, date, t))
+    return true;
+  return false;
+}
+
+bool military_range_to_time_range(const a_military_range *military_range,
+                                  const a_time *date,
+                                  a_time_range *time_range)
+{
+  a_time clone = thyme_clone(&time_range->start);
+  if (!military_time_to_time(&military_range->start, date, &time_range->start))
+    return false;
+  if (!military_time_to_time(&military_range->stop, date, &time_range->stop)) {
+    thyme_copy(&time_range->start, &clone);
+    return false;
+  }
+  return true;
+} 
+
 size_t military_time_to_s(char *buffer, a_military_time* time)
 {
   size_t ret = 1; /* for hour */
@@ -282,7 +326,7 @@ void test_military_range_contains()
     x = military_parse_range(RANGE_S, sizeof(RANGE_S)-1, &range);    \
     if (x) TFAILF(" at line %d", x);                                 \
     if (RET != military_range_contains(&range, &time))               \
-      TFAILF("%s", "3");                                             \
+      TFAIL();                                                       \
   } while(0)
   X( 0, "830-831", "831");
   X( 1, "830-831", "830");
@@ -416,6 +460,7 @@ void __attribute__((constructor)) test_military()
 
 #if ONE_OBJ
 #include "main.c"
+#include "thyme.c"
 #endif
 
 /*
