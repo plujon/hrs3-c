@@ -11,7 +11,7 @@
  * valid.  A return value of -1 indicates an error.  Otherwise, the
  * high bit of x indicates (a), and all other bits indicate (b).
  */
-static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time)
+static a_remaining_result hrs3_remaining__(const char *hrsss, time_t time)
 {
   a_hrs3 hrs3;
   if (OK != hrs3_init(&hrs3, hrsss, strlen(hrsss)))
@@ -20,6 +20,20 @@ static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time)
   time_init(&t, time);
   a_remaining_result result = hrs3_remaining(&hrs3, &t);
   hrs3_destroy(&hrs3);
+  return result;
+}
+
+static a_remaining_result hrs3_remaining_(const char *hrsss_in, time_t time)
+{
+  const char *hrsss = hrsss_in;
+  if (strchr(hrsss_in, ':')) {
+    char *s = strdup(hrsss_in);
+    remove_char(s, ':');
+    hrsss = s; 
+  }
+  a_remaining_result result = hrs3_remaining__(hrsss, time);
+  if (hrsss != hrsss_in)
+    free((char *)hrsss);
   return result;
 }
 
@@ -63,6 +77,7 @@ int test_hrs3_remaining_in()
   X(3599, "9-10",  9,  0,  1);
   X(   1, "9-10",  9, 59, 59);
   X(   0, "9-10", 10,  0,  0);
+  X(   0, "9:00-10:00", 10,  0,  0);
   X(  -1, "abc",   0,  0,  0);
 #undef X
   return 0;

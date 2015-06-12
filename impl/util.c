@@ -53,7 +53,6 @@ char *strnchr(const char *s, size_t len, char c)
   return 0;
 }
 
-#if RUN_TESTS
 #include <string.h>
 
 void remove_char(char *s, char c)
@@ -66,7 +65,6 @@ void remove_char(char *s, char c)
     }
   }
 }
-#endif
 
 #if RUN_TESTS
 void test_beginning_of_day()
