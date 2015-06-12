@@ -9,7 +9,7 @@ typedef struct a_week {
   a_day days[7];
 } a_week;
 
-status week_parse(const char *s, size_t size, a_week *week);
+status week_init(a_week *week, const char *s, size_t size);
 void week_destroy(a_week *week);
 void week_add_to_schedule(const a_week *week, const a_time *t, struct a_schedule *schedule);
 

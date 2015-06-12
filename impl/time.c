@@ -1,5 +1,5 @@
-#ifndef __thyme_c__
-#define __thyme_c__
+#ifndef __time_c__
+#define __time_c__
 
 /*
  * Recommended reading:
@@ -8,89 +8,89 @@
  * https://en.wikipedia.org/wiki/Leap_second
  * https://en.wikipedia.org/wiki/Daylight_saving_time
  *
- * thyme is primarily unix time, with cached translation into human time.
+ * time is primarily unix time, with cached translation into human time.
  */
 
 #include "impl.h"
 #include <string.h>
 
-int thyme_cmp(const a_time *a, const a_time *b)
+int time_cmp(const a_time *a, const a_time *b)
 {
-  int x = thyme_diff(a, b);
+  int x = time_diff(a, b);
   if (x < 0) /* b is bigger than a */ return -1;
   if (0 < x) /* a is bigger than b */ return 1;
   return 0;
 }
 
-int thyme_diff(const a_time *later, const a_time *earlier)
+int time_diff(const a_time *later, const a_time *earlier)
 {
-  return thyme_time(later) - thyme_time(earlier);
+  return time_time(later) - time_time(earlier);
 }
 
-bool thyme_precedes(const a_time *earlier, const a_time *later)
+bool time_precedes(const a_time *earlier, const a_time *later)
 {
-  return 0 < thyme_diff(later, earlier);
+  return 0 < time_diff(later, earlier);
 }
 
-a_time thyme_clone(const a_time *src)
+a_time time_clone(const a_time *src)
 {
   return *src;
 }
 
-void thyme_copy(a_time *dest, const a_time *src)
+void time_copy(a_time *dest, const a_time *src)
 {
   if (dest != src)
     memcpy(dest, src, sizeof(a_time));
 }
 
-void thyme_incr(a_time *t, int sec)
+void time_incr(a_time *t, int sec)
 {
   if (0 != sec) {
-    time_t stamp = thyme_time(t);
-    thyme_init(t, stamp + sec);
+    time_t stamp = time_time(t);
+    time_init(t, stamp + sec);
   }
 }
 
-void thyme_next_day(a_time *t)
+void time_next_day(a_time *t)
 {
   /*
    * Most days are 3600 * 24 seconds, but some have +/- 1 leap second
    * and others have +/- 3600 because of DST.
    */
 #if CHECK
-  int tm_wday = thyme_tm(t)->tm_wday;
+  int tm_wday = time_tm(t)->tm_wday;
 #endif
-  if (!thyme_hms(t, 23, 59, 59) && !thyme_hms(t, 23, 59, 58))
+  if (!time_hms(t, 23, 59, 59) && !time_hms(t, 23, 59, 58))
     BUG();
-  while (thyme_tm(t)->tm_sec != 0)
-    thyme_incr(t, 1);
+  while (time_tm(t)->tm_sec != 0)
+    time_incr(t, 1);
 #if CHECK
-  if (0 != thyme_tm(t)->tm_hour) BUG();
-  if (0 != thyme_tm(t)->tm_min) BUG();
-  if ((tm_wday + 1 % 7) != thyme_tm(t)->tm_wday) BUG();
+  if (0 != time_tm(t)->tm_hour) BUG();
+  if (0 != time_tm(t)->tm_min) BUG();
+  if ((tm_wday + 1 % 7) != time_tm(t)->tm_wday) BUG();
 #endif
 }
 
-void thyme_next_week(a_time *t)
+void time_next_week(a_time *t)
 {
-  thyme_whms(t, 6, 23, 59, 59);
-  thyme_incr(t, 1);
+  time_whms(t, 6, 23, 59, 59);
+  time_incr(t, 1);
 #if CHECK
-  if (0 != thyme_tm(t)->tm_wday) BUG();
-  if (0 != thyme_tm(t)->tm_hour) BUG();
-  if (0 != thyme_tm(t)->tm_min) BUG();
-  if (0 != thyme_tm(t)->tm_sec) BUG();
+  if (0 != time_tm(t)->tm_wday) BUG();
+  if (0 != time_tm(t)->tm_hour) BUG();
+  if (0 != time_tm(t)->tm_min) BUG();
+  if (0 != time_tm(t)->tm_sec) BUG();
 #endif
 }
 
-a_time thyme_plus(const a_time *t, int sec)
+a_time time_plus(const a_time *t, int sec)
 {
-  a_time ret = thyme_clone(t);
-  thyme_incr(&ret, sec);
+  a_time ret = time_clone(t);
+  time_incr(&ret, sec);
   return ret;
 }
 
-time_t thyme_time(const a_time *t)
+time_t time_time(const a_time *t)
 {
 #if CHECK
   if (!t->time) BUG();
@@ -98,7 +98,7 @@ time_t thyme_time(const a_time *t)
   return t->time;
 }
 
-const struct tm *thyme_tm(const a_time *t)
+const struct tm *time_tm(const a_time *t)
 {
   if (!t->tm.tm_year) {
 #if CHECK
@@ -109,21 +109,21 @@ const struct tm *thyme_tm(const a_time *t)
   return &t->tm;
 }
 
-a_time *thyme_minimum(const a_time *a, const a_time *b)
+a_time *time_minimum(const a_time *a, const a_time *b)
 {
-  time_t time_a = thyme_time(a);
-  time_t time_b = thyme_time(b);
+  time_t time_a = time_time(a);
+  time_t time_b = time_time(b);
   return (a_time *)(time_a < time_b ? a : b);
 }
 
-a_time *thyme_maximum(const a_time *a, const a_time *b)
+a_time *time_maximum(const a_time *a, const a_time *b)
 {
-  time_t time_a = thyme_time(a);
-  time_t time_b = thyme_time(b);
+  time_t time_a = time_time(a);
+  time_t time_b = time_time(b);
   return (a_time *)(time_a < time_b ? b : a);
 }
 
-void thyme_init(a_time *t, time_t time)
+void time_init(a_time *t, time_t time)
 {
   t->time = time;
   memset(&t->tm, 0, sizeof(struct tm));
@@ -133,84 +133,84 @@ void thyme_init(a_time *t, time_t time)
  * Some hour, min, sec combinations are not valid.  E.g., in PST in
  * Spring, the clock jumps from 2am to 3am on March 8, 2015.  I.e.,
  *
- *   false == thyme_hms(march_8_2015, 2, 0, 0);
+ *   false == time_hms(march_8_2015, 2, 0, 0);
  *
  * Likewise, some hour, min, sec combinations can lead to two
  * different results for t, both of which are valid.  E.g., in PST in
  * Fall, the clock jumps from 2am back to 1am on November 11, 2015.
  * I.e.,
  *
- *   true == thyme_hms(november_11_2015, 1, 0, 0);
+ *   true == time_hms(november_11_2015, 1, 0, 0);
  *   1446368400 == november_11_2015 || 1446372000 == november_11_2015;
  *   1446368400 + 3600 == 1446372000;
  */
-bool thyme_hms(a_time *t, int hour, int min, int sec)
+bool time_hms(a_time *t, int hour, int min, int sec)
 {
-  return thyme_ymdhms(t,
-                      thyme_tm(t)->tm_year + 1900,
-                      thyme_tm(t)->tm_mon + 1,
-                      thyme_tm(t)->tm_mday,
+  return time_ymdhms(t,
+                      time_tm(t)->tm_year + 1900,
+                      time_tm(t)->tm_mon + 1,
+                      time_tm(t)->tm_mday,
                       hour, min, sec);
 }
 
-static bool thyme_wday(a_time *t, int wday)
+static bool time_wday(a_time *t, int wday)
 { 
   /*
    * Find the day in the same week as t that has wday.  If the day is
    * earlier in the week, set t to the last second of the target day.
    * If the day is later in the week, set to to the first second of
    * the target day.  This preserves the "nearest match" behavior
-   * described in thyme_ymdhms.  Avoid overshooting into another week
+   * described in time_ymdhms.  Avoid overshooting into another week
    * by incrementing conservatively.  This is not a simple 24 because
    * of DST and leap seconds.
    */
-  int tm_wday = thyme_tm(t)->tm_wday;
+  int tm_wday = time_tm(t)->tm_wday;
   if (tm_wday == wday)
     return true;
-  thyme_incr(t, 3600 * (24 - 1) * (wday - tm_wday));
-  if (thyme_tm(t)->tm_wday == wday)
-    return tm_wday < wday ? thyme_hms(t, 0, 0, 0) : thyme_hms(t, 23, 59, 59);
-  return thyme_wday(t, wday);
+  time_incr(t, 3600 * (24 - 1) * (wday - tm_wday));
+  if (time_tm(t)->tm_wday == wday)
+    return tm_wday < wday ? time_hms(t, 0, 0, 0) : time_hms(t, 23, 59, 59);
+  return time_wday(t, wday);
 }
 
 /*
- * thyme_whms takes care to prefer the nearest future time when matching time.
+ * time_whms takes care to prefer the nearest future time when matching time.
  */
-bool thyme_whms(a_time *t, int wday, int hour, int min, int sec)
+bool time_whms(a_time *t, int wday, int hour, int min, int sec)
 {
-  int tm_wday = thyme_tm(t)->tm_wday;
+  int tm_wday = time_tm(t)->tm_wday;
   if (tm_wday == wday)
-    return thyme_hms(t, hour, min, sec);
-  a_time target_day = thyme_clone(t);
-  if (!thyme_wday(&target_day, wday))
+    return time_hms(t, hour, min, sec);
+  a_time target_day = time_clone(t);
+  if (!time_wday(&target_day, wday))
     return false;
   if (tm_wday < wday) {
     /* go forward to start of correct day */
-    if (!thyme_hms(&target_day, 0, 0, 0))
+    if (!time_hms(&target_day, 0, 0, 0))
       return false;
   } else {
     /* go back to end of correct day */
-    if (!thyme_hms(&target_day, 23, 59, 59))
+    if (!time_hms(&target_day, 23, 59, 59))
       return false;
   }
-  if (!thyme_hms(&target_day, hour, min, sec))
+  if (!time_hms(&target_day, hour, min, sec))
     return false;
-  thyme_copy(t, &target_day);
+  time_copy(t, &target_day);
   return true;
 }
 
-static bool thyme_is_ymdhms(a_time *t, int year, int mon, int mday,
+static bool time_is_ymdhms(a_time *t, int year, int mon, int mday,
                             int hour, int min, int sec)
 {
-  return (sec == thyme_tm(t)->tm_sec &&
-          hour == thyme_tm(t)->tm_hour &&
-          min == thyme_tm(t)->tm_min &&
-          mday == thyme_tm(t)->tm_mday &&
-          mon - 1 == thyme_tm(t)->tm_mon &&
-          year - 1900 == thyme_tm(t)->tm_year) ? true : false;
+  return (sec == time_tm(t)->tm_sec &&
+          hour == time_tm(t)->tm_hour &&
+          min == time_tm(t)->tm_min &&
+          mday == time_tm(t)->tm_mday &&
+          mon - 1 == time_tm(t)->tm_mon &&
+          year - 1900 == time_tm(t)->tm_year) ? true : false;
 }
 
-bool thyme_ymdhms(a_time *t,
+bool time_ymdhms(a_time *t,
                   int year, int mon, int mday,
                   int hour, int min, int sec)
 {
@@ -221,9 +221,9 @@ bool thyme_ymdhms(a_time *t,
    * Apologies to Australia's Lord Howe Island, which uses a half-hour
    * shift, and which is not handled in this code.
    */ 
-  if (thyme_is_ymdhms(t, year, mon, mday, hour, min, sec))
+  if (time_is_ymdhms(t, year, mon, mday, hour, min, sec))
     return true;
-   struct tm target_tm = *thyme_tm(t);
+   struct tm target_tm = *time_tm(t);
    target_tm.tm_year = year - 1900;
    target_tm.tm_mon = mon - 1;
    target_tm.tm_mday = mday;
@@ -236,16 +236,16 @@ bool thyme_ymdhms(a_time *t,
    time_t tt = mktime(&target_tm);
    if (-1 == tt)
      return false;
-   thyme_init(&target, tt);
-   bool target_is_future = 0 < thyme_diff(&target, t) ? true : false;
+   time_init(&target, tt);
+   bool target_is_future = 0 < time_diff(&target, t) ? true : false;
    int dst_check_offset = target_is_future ? -3600 : 3600;
-   a_time dst_check = thyme_clone(&target);
-   thyme_incr(&dst_check, dst_check_offset);
-   if (thyme_is_ymdhms(&dst_check, year, mon, mday, hour, min, sec) &&
-       0 <= thyme_diff(&dst_check, t)) {
-     thyme_copy(&target, &dst_check);
+   a_time dst_check = time_clone(&target);
+   time_incr(&dst_check, dst_check_offset);
+   if (time_is_ymdhms(&dst_check, year, mon, mday, hour, min, sec) &&
+       0 <= time_diff(&dst_check, t)) {
+     time_copy(&target, &dst_check);
    }
-   thyme_copy(t, &target);
+   time_copy(t, &target);
    return true;
  }
 
@@ -268,15 +268,15 @@ int days_in_mon(int nmon, int nyear)
   return 0;
 }
 
-size_t thyme_string_length()
+size_t time_string_length()
 {
   return sizeof("CCYYMMDDHHMMSS") - 1; /* 14 */
 }
 
-status thyme_parse(const char *s, size_t len, a_time *out)
+status time_parse(a_time *out, const char *s, size_t len)
 {
   memset(out, 0, sizeof(a_time));
-  if (len < thyme_string_length()) {
+  if (len < time_string_length()) {
     return __LINE__;
   }
   int year = s_to_d(s, 4); s += 4;
@@ -289,16 +289,16 @@ status thyme_parse(const char *s, size_t len, a_time *out)
   int minute = s_to_d(s, 2); s += 2;
   if (minute < 0 || 60 <= minute) return __LINE__;
   int second = s_to_d(s, 2); s += 2;
-  thyme_copy(out, thyme_now());
-  if (!thyme_ymdhms(out, year, mon, day, hour, minute, second))
+  time_copy(out, time_now());
+  if (!time_ymdhms(out, year, mon, day, hour, minute, second))
     return __LINE__;
   return OK;
 }
 
 /* TODO - Maybe put seconds in buffer too. */
-size_t thyme_to_s(char *buffer, const a_time *t)
+size_t time_to_s(const a_time *t, char *buffer)
 {
-  const struct tm *tm = thyme_tm(t);
+  const struct tm *tm = time_tm(t);
   dd_to_s(buffer, ((tm->tm_year + 1900) / 100));
   dd_to_s(&buffer[2], ((tm->tm_year + 1900) % 100));
   dd_to_s(&buffer[4], tm->tm_mon + 1);
@@ -309,29 +309,29 @@ size_t thyme_to_s(char *buffer, const a_time *t)
   return 14;
 }
 
-const a_time *thyme_now()
+const a_time *time_now()
 {
   static a_time now;
   if (!now.time)
-    thyme_init(&now, time(0));
+    time_init(&now, time(0));
   return &now;
 }
 
 #if RUN_TESTS
-static void test_thyme_()
+static void test_time_()
 {
   a_time t1;
-  thyme_init(&t1, time(0));
+  time_init(&t1, time(0));
 }
 
-static void test_thyme_ymdhms()
+static void test_time_ymdhms()
 {
   a_time t;
   time_t now = time(0);
-  thyme_init(&t, now);
+  time_init(&t, now);
 #define X(year, mon, day, hour, min, sec) do {                        \
-    thyme_ymdhms(&t, year, mon, day, hour, min, sec);                 \
-    const struct tm *tm = thyme_tm(&t);                               \
+    time_ymdhms(&t, year, mon, day, hour, min, sec);                 \
+    const struct tm *tm = time_tm(&t);                               \
     if (tm->tm_year != year - 1900 ||                                 \
         tm->tm_mon != mon - 1 ||                                      \
         tm->tm_mday != day ||                                         \
@@ -346,15 +346,15 @@ static void test_thyme_ymdhms()
 #undef X
 }
 
-static void test_thyme_whms()
+static void test_time_whms()
 {
-  a_time t_ = thyme_clone(thyme_now()), *t = &t_;
+  a_time t_ = time_clone(time_now()), *t = &t_;
 #define X(wday, hour, min, sec) do {                                  \
-    thyme_whms(t, wday, hour, min, sec);                              \
-    time_t time = thyme_time(t);                                      \
+    time_whms(t, wday, hour, min, sec);                              \
+    time_t time = time_time(t);                                      \
     a_time t2;                                                         \
-    thyme_init(&t2, time);                                             \
-    const struct tm *tm = thyme_tm(&t2);                                \
+    time_init(&t2, time);                                             \
+    const struct tm *tm = time_tm(&t2);                                \
     if (tm->tm_wday != wday) TFAILF(" %s", "wday mismatch");          \
     if (tm->tm_sec != sec) TFAILF(" sec %d vs %d", tm->tm_sec, sec); \
     if (tm->tm_min != min) TFAILF(" min %d vs %d", tm->tm_min, min); \
@@ -366,11 +366,11 @@ static void test_thyme_whms()
 #undef X
 }
 
-static void test_thyme_parse()
+static void test_time_parse()
 {
   a_time t_, *t = &t_;
 #define X(S) do {                                                     \
-    if (thyme_parse(S, sizeof(S) - 1, t)) TFAIL();                    \
+    if (time_parse(t, S, sizeof(S) - 1)) TFAIL();                     \
   } while (0)
   X("20150611163613");
   X("20150111163613");
@@ -392,12 +392,12 @@ static void test_is_leap_year()
 #undef X
 }
 
-void __attribute__((constructor)) test_thyme()
+void __attribute__((constructor)) test_time()
 {
-  test_thyme_();
-  test_thyme_whms();
-  test_thyme_ymdhms();
-  test_thyme_parse();
+  test_time_();
+  test_time_whms();
+  test_time_ymdhms();
+  test_time_parse();
   test_is_leap_year();
 }
 #endif /* RUN_TESTS */
@@ -409,9 +409,9 @@ void __attribute__((constructor)) test_thyme()
 
 /*
  * Local Variables:
- * compile-command: "gcc -Wall -DTEST -g -o thyme thyme.c && ./thyme"
+ * compile-command: "gcc -Wall -DTEST -g -o time time.c && ./time"
  * End:
  */
 
-#endif /* __thyme_c__ */
+#endif /* __time_c__ */
 

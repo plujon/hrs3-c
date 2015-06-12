@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void day_clone(a_day *dest, a_day *src)
+void day_clone(a_day *dest, const a_day *src)
 {
   if (dest->ranges) {
     day_destroy(dest);
@@ -18,7 +18,7 @@ void day_clone(a_day *dest, a_day *src)
   }
 }
 
-void day_copy(a_day *dest, a_day *src)
+void day_copy(a_day *dest, const a_day *src)
 {
   if (dest->ranges) {
     day_destroy(dest);
@@ -71,7 +71,7 @@ void day_grow(a_day *day)
     day->ranges = malloc(sizeof(day->ranges[0]) * day->capacity);
 }
 
-void day_insert_at(a_day *day, size_t index, a_military_range *insertee)
+void day_insert_at(a_day *day, size_t index, const a_military_range *insertee)
 {
   while (day->capacity <= day->n_ranges)
     day_grow(day);
@@ -85,7 +85,7 @@ void day_insert_at(a_day *day, size_t index, a_military_range *insertee)
   day->n_ranges += 1;
 }
 
-void day_insert(a_day *dest, a_military_range *range)
+void day_insert(a_day *dest, const a_military_range *range)
 {
   size_t i = 0;
   for (; i < dest->n_ranges; ++i) {
@@ -106,7 +106,7 @@ void day_insert(a_day *dest, a_military_range *range)
   day_coallesce(dest);
 }
 
-void day_merge(a_day *dest, a_day *src)
+void day_merge(a_day *dest, const a_day *src)
 {
   while (dest->capacity < dest->n_ranges + src->n_ranges) {
     day_grow(dest);
@@ -119,46 +119,46 @@ void day_merge(a_day *dest, a_day *src)
 }
 
 /* 10-12 */
-status day_parse_single(const char *s, size_t len, a_day *day)
+status day_parse_single(a_day *day, const char *s, size_t len)
 {
   if (day)
     memset(day, 0, sizeof(a_day));
   a_military_range range;
-  NOD(military_parse_range(s, len, &range));
+  NOD(military_parse_range(&range, s, len));
   if (day)
     day_insert(day, &range);
   return OK;
 }
 
 /* 10-12&13-15 */
-status day_parse(const char *s, size_t len, a_day *day)
+status day_init(a_day *day, const char *s, size_t len)
 {
   if (!s || !*s)
     return __LINE__;
   const char *amp = strnchr(s, len, '&');
   if (amp) {
     size_t offset = amp - s;
-    NOD(day_parse_single(s, offset, day));
+    NOD(day_parse_single(day, s, offset));
     s += offset + 1;
     len -= offset + 1;
     a_day rest;
-    NOD(day_parse(s, len, day ? &rest : 0));
+    NOD(day_init(day ? &rest : 0, s, len));
     if (day) {
       day_merge(day, &rest);
       day_destroy(&rest);
     }
     return OK;
   }
-  return day_parse_single(s, len, day);
+  return day_parse_single(day, s, len);
 }
 
-size_t day_to_s(char *buffer, a_day *day)
+size_t day_to_s(a_day *day, char *buffer)
 {
-  size_t offset = military_range_to_s(&buffer[0], &day->ranges[0]);
+  size_t offset = military_range_to_s(&day->ranges[0], &buffer[0]);
   size_t i = 1;
   for (; i < day->n_ranges; ++i) {
     buffer[offset++] = '&';
-    offset += military_range_to_s(&buffer[offset], &day->ranges[i]);
+    offset += military_range_to_s(&day->ranges[i], &buffer[offset]);
   }
   return offset;
 }
@@ -166,7 +166,7 @@ size_t day_to_s(char *buffer, a_day *day)
 char *day_to_s_dup(a_day *day)
 {
   char buffer[0x200];
-  size_t offset = day_to_s(buffer, day);
+  size_t offset = day_to_s(day, buffer);
   buffer[offset] = 0;
   return strdup(buffer);
 }
@@ -187,13 +187,13 @@ void day_add_to_schedule(const a_day *day, const a_time *t, a_schedule *schedule
 
 static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time);
 
-void test_day_parse()
+void test_day_init()
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    a_time t = *thyme_now();                                            \
-    thyme_hms(&t, h, m, s);                                             \
-    a_remaining_result result = hrs3_remaining_(x, thyme_time(&t));     \
+    a_time t = *time_now();                                            \
+    time_hms(&t, h, m, s);                                             \
+    a_remaining_result result = hrs3_remaining_(x, time_time(&t));     \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
     if (is_in_schedule != result.time_is_in_schedule)                   \
@@ -205,7 +205,7 @@ void test_day_parse()
 #undef X
 #define BAD(s) do {                                                     \
     a_day day;                                                          \
-    if (OK == day_parse(s, sizeof(s)-1, &day))                          \
+    if (OK == day_init(&day, s, sizeof(s)-1))                          \
       TFAIL();                                                          \
   } while(0)
   BAD("U");
@@ -219,8 +219,8 @@ void test_day_merge()
 {
 #define X(A, B, AB)                                             \
   do {                                                          \
-    a_day a; if (day_parse(A, sizeof(A) - 1, &a)) TFAIL();      \
-    a_day b; if (day_parse(B, sizeof(B) - 1, &b)) TFAIL();      \
+    a_day a; if (day_init(&a, A, sizeof(A) - 1)) TFAIL();      \
+    a_day b; if (day_init(&b, B, sizeof(B) - 1)) TFAIL();      \
     day_merge(&a, &b);                                          \
     if (strcmp(day_to_s_dup(&a), AB))                           \
       TFAILF(" '%s' vs '%s'", day_to_s_dup(&a), AB);            \
@@ -236,9 +236,9 @@ void test_daily_remaining()
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
-    a_time t = *thyme_now();                                            \
-    thyme_hms(&t, h, m, s);                                             \
-    a_remaining_result result = hrs3_remaining_(x, thyme_time(&t));     \
+    a_time t = *time_now();                                            \
+    time_hms(&t, h, m, s);                                             \
+    a_remaining_result result = hrs3_remaining_(x, time_time(&t));     \
     if (!result.is_valid)                                               \
       TFAIL();                                                          \
     if (is_in_schedule != result.time_is_in_schedule)                   \
@@ -278,7 +278,7 @@ void test_daily_remaining()
 
 void __attribute__((constructor)) test_daily()
 {
-  test_day_parse();
+  test_day_init();
   test_day_merge();
   test_daily_remaining();
 }
@@ -289,7 +289,7 @@ void __attribute__((constructor)) test_daily()
 #include "military.c"
 #include "remaining.c"
 #include "schedule.c"
-#include "thyme.c"
+#include "time.c"
 #include "util.c"
 #include "../hrs3.c"
 #endif

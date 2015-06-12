@@ -6,7 +6,7 @@
 #include "remaining.c"
 #include "schedule.c"
 #include "time_range.c"
-#include "thyme.c"
+#include "time.c"
 #include "util.c"
 #include "weekly.c"
 

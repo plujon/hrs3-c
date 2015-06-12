@@ -82,7 +82,7 @@ void week_merge(a_week *dest, a_week *src)
 }
 
 /* MWF10-12 */
-status week_parse_single(const char *s, size_t len, a_week *week)
+status week_parse_single(a_week *week, const char *s, size_t len)
 {
   if (week)
     memset(week, 0, sizeof(a_week));
@@ -93,7 +93,7 @@ status week_parse_single(const char *s, size_t len, a_week *week)
   s += offset;
   len -= offset;
   a_day day;
-  NOD(day_parse(s, len, &day));
+  NOD(day_init(&day, s, len));
   if (week) {
     size_t i = 0;
     for (; i < DIM(day_descriptors); ++i) {
@@ -107,33 +107,33 @@ status week_parse_single(const char *s, size_t len, a_week *week)
 }
 
 /* MWF10-12.T8-9 */
-status week_parse(const char *s, size_t len, a_week *week)
+status week_init(a_week *week, const char *s, size_t len)
 {
   const char *period = strnchr(s, len, '.');
   if (period) {
     size_t offset = period - s;
-    NOD(week_parse_single(s, offset, week));
+    NOD(week_parse_single(week, s, offset));
     s += offset + 1;
     len -= offset + 1;
     a_week rest;
-    NOD(week_parse(s, len, week ? &rest : 0));
+    NOD(week_init(week ? &rest : 0, s, len));
     if (week) {
       week_merge(week, &rest);
       week_destroy(&rest);
     }
     return OK;
   }
-  return week_parse_single(s, len, week);
+  return week_parse_single(week, s, len);
 }
 
 void week_add_to_schedule(const a_week *week, const a_time *t, a_schedule *schedule)
 {
-  a_time date_ = thyme_clone(t), *date = &date_;
+  a_time date_ = time_clone(t), *date = &date_;
   size_t i = 0;
   for (; i < DIM(week->days); ++i) {
     const a_day *day = &week->days[i];
     if (0 == day->n_ranges) continue;
-    thyme_whms(date, i, 0, 0, 0);
+    time_whms(date, i, 0, 0, 0);
     day_add_to_schedule(day, date, schedule);
   }
 }
@@ -160,9 +160,9 @@ static int thwr_aux(const char *hrsss,
                     int is_valid, int time_is_in_schedule, int seconds)
 {
   a_remaining_result expected = { is_valid, time_is_in_schedule, seconds };
-  a_time t = thyme_clone(thyme_now());
-  thyme_whms(&t, wday, hour, minute, second);
-  a_remaining_result result = hrs3_remaining_(hrsss, thyme_time(&t));
+  a_time t = time_clone(time_now());
+  time_whms(&t, wday, hour, minute, second);
+  a_remaining_result result = hrs3_remaining_(hrsss, time_time(&t));
   return (expected.is_valid == result.is_valid &&
           expected.time_is_in_schedule == result.time_is_in_schedule &&
           expected.seconds == result.seconds) ? 0 : 1;
@@ -199,8 +199,8 @@ static void test_weekly_remaining()
   OUT("U1-2&3-4.M6-7&8-9",    1,  9,  0,  0, 3600 * 24 * 6 - 3600 * 8);
 #undef OUT
 #define BAD(hrsss) do {                                                 \
-    a_time t = thyme_clone(thyme_now());                                \
-    a_remaining_result result = hrs3_remaining_(hrsss, thyme_time(&t)); \
+    a_time t = time_clone(time_now());                                \
+    a_remaining_result result = hrs3_remaining_(hrsss, time_time(&t)); \
     if (result.is_valid) TFAIL();                                       \
   } while(0)
   BAD("U");

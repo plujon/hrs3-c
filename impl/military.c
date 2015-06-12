@@ -53,7 +53,7 @@ static status military_fill(const char *s, int len, a_mil_string milstr)
   return 0;
 }
 
-int military_time_cmp(a_military_time *a, a_military_time *b)
+int military_time_cmp(const a_military_time *a, const a_military_time *b)
 {
   if (!a || !b) return -1;
   if (a->hour < b->hour) return -1;
@@ -63,7 +63,7 @@ int military_time_cmp(a_military_time *a, a_military_time *b)
   return 0;
 }
 
-int military_range_cmp(a_military_range *a, a_military_range *b)
+int military_range_cmp(const a_military_range *a, const a_military_range *b)
 {
   if (!a || !b) return -1;
   int x = military_time_cmp(&a->start, &b->start);
@@ -74,7 +74,7 @@ int military_range_cmp(a_military_range *a, a_military_range *b)
 }
 
 /* return a - b in seconds */
-int military_time_diff(a_military_time *later, a_military_time *prior)
+int military_time_diff(const a_military_time *later, const a_military_time *prior)
 {
   int seconds = 0;
   seconds += 3600 * (later->hour - prior->hour) +
@@ -91,18 +91,18 @@ int military_time_as_seconds_of_day(a_military_time *time)
   return 3600 * time->hour + 60 * time->minute;
 }
 
-int military_range_in_seconds(a_military_range *range)
+int military_range_in_seconds(const a_military_range *range)
 {
   return military_time_diff(&range->stop, &range->start);
 }
 
-bool military_range_contains(a_military_range *range, a_military_time *time)
+bool military_range_contains(const a_military_range *range, const a_military_time *time)
 {
   return (military_time_cmp(&range->start, time) <= 0 &&
           military_time_cmp(time, &range->stop) < 0) ? true : false;
 }
 
-status military_parse_time(const char *s, int len, a_military_time *time)
+status military_parse_time(a_military_time *time, const char *s, int len)
 {
 #if CHECK
   if (len < 0)
@@ -143,7 +143,7 @@ status military_parse_time(const char *s, int len, a_military_time *time)
   return 0;
 }
 
-status military_parse_range(const char *s, int len, a_military_range* range)
+status military_parse_range(a_military_range* range, const char *s, int len)
 {
   if (!s || !*s)
     return __LINE__;
@@ -155,10 +155,10 @@ status military_parse_range(const char *s, int len, a_military_range* range)
   size_t dash_offset = dash - s;
   if (!dash || end <= dash)
     return __LINE__;
-  if (military_parse_time(s, dash_offset, start))
+  if (military_parse_time(start, s, dash_offset))
     return __LINE__;
   s = dash + 1;
-  if (military_parse_time(s, end - s, stop))
+  if (military_parse_time(stop, s, end - s))
     return __LINE__;
   if (0 <= military_time_cmp(start, stop))
     return __LINE__;
@@ -173,11 +173,11 @@ bool military_time_to_time_no_dst_adjust(const a_military_time *military_time,
                                          const a_time *date,
                                          a_time *t)
 {
-  a_time clone = thyme_clone(t);
-  thyme_copy(t, date);
-  if (thyme_hms(t, military_time->hour, military_time->minute, 0))
+  a_time clone = time_clone(t);
+  time_copy(t, date);
+  if (time_hms(t, military_time->hour, military_time->minute, 0))
     return true;
-  thyme_copy(t, &clone);
+  time_copy(t, &clone);
   return false;
 } 
 
@@ -199,17 +199,17 @@ bool military_range_to_time_range(const a_military_range *military_range,
                                   const a_time *date,
                                   a_time_range *time_range)
 {
-  a_time clone = thyme_clone(&time_range->start);
+  a_time clone = time_clone(&time_range->start);
   if (!military_time_to_time(&military_range->start, date, &time_range->start))
     return false;
   if (!military_time_to_time(&military_range->stop, date, &time_range->stop)) {
-    thyme_copy(&time_range->start, &clone);
+    time_copy(&time_range->start, &clone);
     return false;
   }
   return true;
 } 
 
-size_t military_time_to_s(char *buffer, a_military_time* time)
+size_t military_time_to_s(const a_military_time* time, char *buffer)
 {
   size_t ret = 1; /* for hour */
   if (10 <= time->hour) ret += 1;
@@ -237,21 +237,21 @@ size_t military_time_to_s(char *buffer, a_military_time* time)
   return ret;
 }
 
-size_t military_range_to_s(char *buffer, a_military_range* range)
+size_t military_range_to_s(const a_military_range* range, char *buffer)
 {
   size_t offset = 0;
-  offset += military_time_to_s(&buffer[offset], &range->start);
+  offset += military_time_to_s(&range->start, &buffer[offset]);
   buffer[offset++] = '-';
-  offset += military_time_to_s(&buffer[offset], &range->stop);
+  offset += military_time_to_s(&range->stop, &buffer[offset]);
   return offset;
 }
 
-static bool military_range_overlaps(a_military_range *earlier, a_military_range *later)
+static bool military_range_overlaps(const a_military_range *earlier, const a_military_range *later)
 {
   return military_time_cmp(&later->start, &earlier->stop) < 1 ? true : false;
 }
 
-static bool military_range_abuts(a_military_range *earlier, a_military_range *later)
+static bool military_range_abuts(const a_military_range *earlier, const a_military_range *later)
 {
   if (earlier->stop.minute == 59)
     return 0 == later->start.minute &&
@@ -260,22 +260,22 @@ static bool military_range_abuts(a_military_range *earlier, a_military_range *la
     return earlier->stop.minute + 1 == later->start.minute;
 }
 
-a_military_time *mil_time_min(a_military_time *a, a_military_time *b)
+a_military_time *mil_time_min(const a_military_time *a, const a_military_time *b)
 {
-  if (a->hour < b->hour) return a;
-  if (b->hour < a->hour) return b;
-  if (a->minute < b->minute) return a;
-  return b;
+  if (a->hour < b->hour) return (a_military_time *)a;
+  if (b->hour < a->hour) return (a_military_time *)b;
+  if (a->minute < b->minute) return (a_military_time *)a;
+  return (a_military_time *) b;
 }
 
-a_military_time *mil_time_max(a_military_time *a, a_military_time *b)
+a_military_time *mil_time_max(const a_military_time *a, const a_military_time *b)
 {
   if (a == mil_time_min(a, b))
-    return b;
-  return a;
+    return (a_military_time *)b;
+  return (a_military_time *)a;
 }
 
-void military_range_merge(a_military_range *a, a_military_range *b)
+void military_range_merge(a_military_range *a, const a_military_range *b)
 {
 #if CHECK
   if (military_time_cmp(&a->stop, &b->start) < 0)
@@ -285,7 +285,7 @@ void military_range_merge(a_military_range *a, a_military_range *b)
   a->stop = *mil_time_max(&a->stop, &b->stop);
 }
 
-bool military_range_overlaps_or_abuts(a_military_range *a, a_military_range *b)
+bool military_range_overlaps_or_abuts(const a_military_range *a, const a_military_range *b)
 {
   switch (military_time_cmp(&a->start, &b->start)) {
   case 0: return true;
@@ -321,9 +321,9 @@ void test_military_range_contains()
     a_military_time time;                                            \
     a_military_range range;                                          \
     int x;                                                           \
-    x = military_parse_time(TIME_S, sizeof(TIME_S)-1, &time);        \
+    x = military_parse_time(&time, TIME_S, sizeof(TIME_S)-1);        \
     if (x) TFAILF(" at line %d", x);                                 \
-    x = military_parse_range(RANGE_S, sizeof(RANGE_S)-1, &range);    \
+    x = military_parse_range(&range, RANGE_S, sizeof(RANGE_S)-1);    \
     if (x) TFAILF(" at line %d", x);                                 \
     if (RET != military_range_contains(&range, &time))               \
       TFAIL();                                                       \
@@ -339,11 +339,11 @@ void test_military_parse_time()
 #define X(ret, x, h, m)                                 \
   do {                                                  \
     if (ret) {                                          \
-      if (!military_parse_time(x, sizeof(x)-1, &mt)) {  \
+      if (!military_parse_time(&mt, x, sizeof(x)-1)) {  \
         TFAIL();                                        \
       }                                                 \
     } else {                                            \
-      if (military_parse_time(x, sizeof(x)-1, &mt)) {   \
+      if (military_parse_time(&mt, x, sizeof(x)-1)) {   \
         TFAIL();                                        \
       }                                                 \
       if (h != mt.hour || m != mt.minute) {             \
@@ -378,9 +378,9 @@ void test_military_time_to_s()
 #define X(IN, EXPECTED) do {                                      \
     char buffer[5];                                               \
     a_military_time time;                                         \
-    if (military_parse_time(IN, sizeof(IN)-1, &time))             \
+    if (military_parse_time(&time, IN, sizeof(IN)-1))             \
       TFAIL();                                                    \
-    if (sizeof(EXPECTED)-1 !=  military_time_to_s(buffer, &time)) \
+    if (sizeof(EXPECTED)-1 !=  military_time_to_s(&time, buffer))      \
       TFAIL();                                                    \
     buffer[sizeof(EXPECTED)-1] = 0;                               \
     if (strcmp(buffer, EXPECTED))                                 \
@@ -399,9 +399,9 @@ void test_military_range_to_s()
 #define X(IN, EXPECTED) do {                                        \
     char buffer[10];                                                \
     a_military_range range;                                         \
-    if (military_parse_range(IN, sizeof(IN)-1, &range))             \
+    if (military_parse_range(&range, IN, sizeof(IN)-1))             \
       TFAIL();                                                      \
-    if (sizeof(EXPECTED)-1 !=  military_range_to_s(buffer, &range)) \
+    if (sizeof(EXPECTED)-1 !=  military_range_to_s(&range, buffer)) \
       TFAIL();                                                      \
     buffer[sizeof(EXPECTED)-1] = 0;                                 \
     if (strcmp(buffer, EXPECTED))                                   \
@@ -420,10 +420,10 @@ void test_military_parse_range()
   a_military_range mr;
 #define XX(ret,s,len,h1,m1,h2,m2) do {                          \
     if (ret) {                                                  \
-      if (!military_parse_range(s, len, &mr))                   \
+      if (!military_parse_range(&mr, s, len))                   \
         TFAIL();                                                \
     } else {                                                    \
-      if (military_parse_range(s, len, &mr))                    \
+      if (military_parse_range(&mr, s, len))                    \
         TFAIL();                                                \
       a_military_range control = { { h1, m1 }, { h2, m2 } };    \
       if (military_range_cmp(&mr, &control))                    \
@@ -460,7 +460,7 @@ void __attribute__((constructor)) test_military()
 
 #if ONE_OBJ
 #include "main.c"
-#include "thyme.c"
+#include "time.c"
 #endif
 
 /*

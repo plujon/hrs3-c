@@ -6,16 +6,16 @@
 a_time beginning_of_day(const a_time *t)
 {
   a_time ret;
-  thyme_copy(&ret, t);
-  thyme_hms(&ret, 0, 0, 0);
+  time_copy(&ret, t);
+  time_hms(&ret, 0, 0, 0);
   return ret;
 }
 
 a_time beginning_of_week(const a_time *t)
 {
   a_time ret;
-  thyme_copy(&ret, t);
-  thyme_whms(&ret, 0, 0, 0, 0);
+  time_copy(&ret, t);
+  time_whms(&ret, 0, 0, 0, 0);
   return ret;
 }
 
@@ -71,9 +71,9 @@ void remove_char(char *s, char c)
 #if RUN_TESTS
 void test_beginning_of_day()
 {
-  a_time t = beginning_of_day(thyme_now());
-  const struct tm *tm = thyme_tm(&t);
-  const struct tm *now_tm = thyme_tm(thyme_now());
+  a_time t = beginning_of_day(time_now());
+  const struct tm *tm = time_tm(&t);
+  const struct tm *now_tm = time_tm(time_now());
   if (tm->tm_hour) TFAIL();
   if (tm->tm_min) TFAIL();
   if (tm->tm_sec) TFAIL();
@@ -82,8 +82,8 @@ void test_beginning_of_day()
 
 void test_beginning_of_week()
 {
-  a_time t = beginning_of_week(thyme_now());
-  const const struct tm *tm = thyme_tm(&t);
+  a_time t = beginning_of_week(time_now());
+  const const struct tm *tm = time_tm(&t);
   if (tm->tm_wday) TFAIL();
   if (tm->tm_hour) TFAIL();
   if (tm->tm_min) TFAIL();
@@ -97,7 +97,7 @@ void __attribute__((constructor)) test_util()
 }
 
 #if ONE_OBJ
-#include "thyme.c"
+#include "time.c"
 #include "main.c"
 #endif
 

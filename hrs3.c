@@ -14,10 +14,10 @@
 static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time)
 {
   a_hrs3 hrs3;
-  if (OK != hrs3_parse(hrsss, strlen(hrsss), &hrs3))
+  if (OK != hrs3_init(&hrs3, hrsss, strlen(hrsss)))
     return remaining_invalid();
   a_time t;
-  thyme_init(&t, time);
+  time_init(&t, time);
   a_remaining_result result = hrs3_remaining(&hrs3, &t);
   hrs3_destroy(&hrs3);
   return result;

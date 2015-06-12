@@ -19,7 +19,7 @@ a_schedule *schedule_create()
   return schedule;
 }
 
-void schedule_init(struct a_schedule *schedule)
+void schedule_init(a_schedule *schedule)
 {
   *schedule = schedule_empty();
 }
@@ -53,8 +53,8 @@ bool schedule_has_range(a_schedule *schedule, a_time_range *range)
   int i = 0;
   for (; i < schedule->n_ranges; ++i) {
     a_time_range *x = &schedule->ranges[i];
-    if (0 == thyme_cmp(&x->start, &range->start) &&
-        0 == thyme_cmp(&x->stop, &range->stop))
+    if (0 == time_cmp(&x->start, &range->start) &&
+        0 == time_cmp(&x->stop, &range->stop))
       return true;
   }
   return false;
@@ -99,7 +99,7 @@ void schedule_insert(a_schedule *schedule, a_time_range *range)
   int i = 0;
   for(; i < schedule->n_ranges; ++i) {
     a_time_range *x = &schedule->ranges[i];
-    if (!inserted_or_merged && 0 < thyme_diff(&range->start, &x->stop)) {
+    if (!inserted_or_merged && 0 < time_diff(&range->start, &x->stop)) {
       /* x->stop precedes range->start, so continue to next x */
       continue;
     }
@@ -127,16 +127,16 @@ a_remaining_result schedule_remaining(const a_schedule *schedule, const a_time *
   int i = 0;
   for(; i < schedule->n_ranges; ++i) {
     a_time_range *range = &schedule->ranges[i];
-    if (!thyme_precedes(t, &range->stop))
+    if (!time_precedes(t, &range->stop))
       continue;
     int seconds = 0;
     bool is_in_range = false;
     if (time_range_contains(range, t)) {
       is_in_range = true;
-      seconds = thyme_diff(&range->stop, t);
+      seconds = time_diff(&range->stop, t);
     } else {
       is_in_range = false;
-      seconds = thyme_diff(&range->start, t);
+      seconds = time_diff(&range->start, t);
     }
     a_remaining_result result = { 1, is_in_range, seconds };
     return result;
@@ -145,7 +145,7 @@ a_remaining_result schedule_remaining(const a_schedule *schedule, const a_time *
   return result;
 }
 
-size_t schedule_to_s(char *buffer, size_t size, const a_schedule *schedule)
+size_t schedule_to_s(const a_schedule *schedule, char *buffer, size_t size)
 {
   size_t offset = 0;
   int i = 0;
@@ -153,7 +153,7 @@ size_t schedule_to_s(char *buffer, size_t size, const a_schedule *schedule)
     a_time_range *x = &schedule->ranges[i];
     if (size <= offset + TIME_RANGE_STR_SIZE + 1)
       break;
-    offset += time_range_to_s(&buffer[offset], x);
+    offset += time_range_to_s(x, &buffer[offset]);
     buffer[offset++] = ' ';
   }
   return offset;
@@ -163,7 +163,7 @@ size_t schedule_to_s(char *buffer, size_t size, const a_schedule *schedule)
 static char *schedule_to_s_(a_schedule *schedule)
 {
   static char buffer[0x400];
-  schedule_to_s(buffer, sizeof(buffer)-1, schedule);
+  schedule_to_s(schedule, buffer, sizeof(buffer)-1);
   return buffer;
 }
 
@@ -171,8 +171,8 @@ void __attribute__((constructor)) test_schedule()
 {
   a_time_range range = time_range_empty();
   a_schedule s = schedule_empty();
-  a_time now = *thyme_now();
-  a_time later = *thyme_now();
+  a_time now = *time_now();
+  a_time later = *time_now();
 #define X(start, seconds, num) do {                                     \
     a_time_range r;                                                     \
     time_range_init(&r, start, seconds);                                \
@@ -183,19 +183,19 @@ void __attribute__((constructor)) test_schedule()
   X(&now, 10, 1);
   time_range_init(&range, &now, 10);
   if (!schedule_has_range(&s, &range)) TFAIL();
-  thyme_incr(&now, -1);
+  time_incr(&now, -1);
   X(&now, 1, 1);
   time_range_init(&range, &now, 11);
   if (!schedule_has_range(&s, &range)) TFAIL();
-  thyme_incr(&now, -1);
+  time_incr(&now, -1);
   X(&now, 3, 1);
   time_range_init(&range, &now, 12);
   if (!schedule_has_range(&s, &range)) TFAIL();
-  thyme_incr(&later, 10);
+  time_incr(&later, 10);
   X(&later, 2, 1);
   time_range_init(&range, &now, 14);
   if (!schedule_has_range(&s, &range)) TFAIL();
-  thyme_incr(&later, 3);
+  time_incr(&later, 3);
   X(&later, 2, 2);
   time_range_init(&range, &later, 2);
   if (!schedule_has_range(&s, &range)) TFAIL();

@@ -21,7 +21,7 @@ void test_dst_()
     char hrsss[0x40];                                                   \
     memcpy(hrsss, HRS3, sizeof(HRS3));                                  \
     remove_char(hrsss, ':');                                            \
-    if (OK != hrs3_parse(hrsss, strlen(hrsss), hrs3)) {                 \
+    if (OK != hrs3_init(hrs3, hrsss, strlen(hrsss))) {                  \
       TFAILF(" failed to parse %s", hrsss);                             \
       break;                                                            \
     }                                                                   \
@@ -29,11 +29,11 @@ void test_dst_()
     memcpy(time_str, DATE TOD, sizeof(DATE TOD));                       \
     remove_char(time_str, ':');                                         \
     a_time time_, *t = &time_;                                          \
-    if (OK != thyme_parse(time_str, strlen(time_str), t)) {             \
+    if (OK != time_parse(t, time_str, strlen(time_str))) {              \
       TFAILF(" failed to parse %s", time_str);                          \
       break;                                                            \
     }                                                                   \
-    thyme_incr(t, T_OFFSET);                                            \
+    time_incr(t, T_OFFSET);                                            \
     a_remaining_result result = hrs3_remaining(hrs3, t);                \
     if (!result.is_valid)                                               \
       TFAILF(" %s", "not valid");                                       \

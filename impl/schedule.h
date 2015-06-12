@@ -11,11 +11,11 @@ typedef struct a_schedule {
   a_time_range *ranges;
 } a_schedule;
 
-void schedule_init(struct a_schedule *schedule);
-void schedule_destroy(struct a_schedule *schedule);
-void schedule_grow(struct a_schedule *schedule);
-void schedule_insert(struct a_schedule *schedule, struct a_time_range *range);
-a_remaining_result schedule_remaining(const struct a_schedule *schedule, const struct a_time *t);
-size_t schedule_to_s(char *buffer, size_t size, const struct a_schedule *schedule);
+void schedule_init(a_schedule *schedule);
+void schedule_destroy(a_schedule *schedule);
+void schedule_grow(a_schedule *schedule);
+void schedule_insert(a_schedule *schedule, struct a_time_range *range);
+a_remaining_result schedule_remaining(const a_schedule *schedule, const struct a_time *t);
+size_t schedule_to_s(const a_schedule *schedule, char *buffer, size_t size);
 
 #endif /* __schedule_h__ */

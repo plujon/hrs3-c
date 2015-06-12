@@ -39,22 +39,22 @@ a_hrs3_kind hrs3_kind(const char *s)
   return Invalid;
 }
 
-static status hrs3_parse_daily(const char *hrsss, size_t len, a_hrs3 *hrs3)
+static status hrs3_parse_daily(a_hrs3 *hrs3, const char *hrsss, size_t len)
 {
   a_day day_, *day = hrs3 ? &hrs3->day : &day_;
-  return day_parse(hrsss, len, day);
+  return day_init(day, hrsss, len);
 }
 
-static status hrs3_parse_weekly(const char *hrsss, size_t len, a_hrs3 *hrs3)
+static status hrs3_parse_weekly(a_hrs3 *hrs3, const char *hrsss, size_t len)
 {
   a_week week_, *week = hrs3 ? &hrs3->week : &week_;
-  return week_parse(hrsss, len, week);
+  return week_init(week, hrsss, len);
 }
 
-static status hrs3_parse_raw(const char *hrsss, size_t len, a_hrs3 *hrs3)
+static status hrs3_parse_raw(a_hrs3 *hrs3, const char *hrsss, size_t len)
 {
   a_time_range time_range_, *time_range = hrs3 ? &hrs3->time_range : &time_range_;
-  return time_range_parse(hrsss, len, time_range);
+  return time_range_parse(time_range, hrsss, len);
 }
 
 void hrs3_add_to_schedule(a_hrs3 *hrs3, const a_time *t, a_schedule *schedule)
@@ -75,21 +75,21 @@ a_remaining_result hrs3_remaining(a_hrs3 *hrs3, const a_time *t)
   a_remaining_result result = schedule_remaining(schedule, t);
   schedule_destroy(schedule);
   if (!result.time_is_in_schedule && 0 == result.seconds) {
-    a_time next_time_ = thyme_clone(t), *next_time = &next_time_;
+    a_time next_time_ = time_clone(t), *next_time = &next_time_;
     if (Daily == hrs3->kind)
-      thyme_next_day(next_time);
+      time_next_day(next_time);
     else if (Weekly == hrs3->kind)
-      thyme_next_week(next_time);
+      time_next_week(next_time);
     else
       return result;
     result = hrs3_remaining(hrs3, next_time);
     result.time_is_in_schedule = false;
-    result.seconds += thyme_diff(next_time, t);
+    result.seconds += time_diff(next_time, t);
   }
   return result;
 }
 
-status hrs3_parse(const char *hrsss, size_t len, a_hrs3 *hrs3)
+status hrs3_init(a_hrs3 *hrs3, const char *hrsss, size_t len)
 {
   a_hrs3_kind kind = hrs3_kind(hrsss);
   if (hrs3) {
@@ -97,9 +97,9 @@ status hrs3_parse(const char *hrsss, size_t len, a_hrs3 *hrs3)
     hrs3->kind = kind;
   }
   switch (kind) {
-  case Daily: return hrs3_parse_daily(hrsss, len, hrs3);
-  case Weekly: return hrs3_parse_weekly(hrsss, len, hrs3);
-  case Raw: return hrs3_parse_raw(hrsss, len, hrs3);
+  case Daily: return hrs3_parse_daily(hrs3, hrsss, len);
+  case Weekly: return hrs3_parse_weekly(hrs3, hrsss, len);
+  case Raw: return hrs3_parse_raw(hrs3, hrsss, len);
   default: return __LINE__;
   }
 }

@@ -10,7 +10,7 @@
 #include "schedule.h"
 #include "test.h"
 #include "time_range.h"
-#include "thyme.h"
+#include "time.h"
 #include "util.h"
 #include "weekly.h"
 

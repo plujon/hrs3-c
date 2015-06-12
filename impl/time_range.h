@@ -1,7 +1,7 @@
 #ifndef __time_range_h__
 #define __time_range_h__
 
-#include "thyme.h"
+#include "time.h"
 #include "remaining.h"
 
 #define TIME_RANGE_STR_SIZE (2 * THYME_STR_SIZE + 1)
@@ -19,8 +19,8 @@ void time_range_merge(a_time_range *dest, a_time_range *src);
 a_time_range *time_range_overlap_alloc(a_time_range *range,
                                        a_time_range *during);
 bool time_range_overlaps_or_abuts(a_time_range *a, a_time_range *b);
-status time_range_parse(const char *s, size_t len, a_time_range *range);
-size_t time_range_to_s(char *buffer, const a_time_range *range);
+status time_range_parse(a_time_range *range, const char *s, size_t len);
+size_t time_range_to_s(const a_time_range *range, char *buffer);
 a_remaining_result time_range_remaining(a_time_range *range, a_time *t);
 
 #endif /* __time_range_h__ */
