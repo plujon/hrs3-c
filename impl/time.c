@@ -67,7 +67,7 @@ void time_next_day(a_time *t)
 #if CHECK
   if (0 != time_tm(t)->tm_hour) BUG();
   if (0 != time_tm(t)->tm_min) BUG();
-  if ((tm_wday + 1 % 7) != time_tm(t)->tm_wday) BUG();
+  if ((tm_wday + 1) % 7 != time_tm(t)->tm_wday) BUG();
 #endif
 }
 
