@@ -11,7 +11,7 @@ a_remaining_result remaining_result(int is_in_schedule, int seconds)
 
 a_remaining_result remaining_invalid()
 {
-  a_remaining_result result = { 0, -1, -1 };
+  a_remaining_result result = { 0, 0, 0 };
   return result;
 }
 
