@@ -27,7 +27,7 @@ void test_raw_remaining()
 #undef X
 }
 
-void __attribute__((constructor)) test_raw()
+PRE_INIT(test_raw)
 {
   test_raw_remaining();
 }

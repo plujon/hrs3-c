@@ -167,7 +167,7 @@ static char *schedule_to_s_(a_schedule *schedule)
   return buffer;
 }
 
-void __attribute__((constructor)) test_schedule()
+PRE_INIT(test_schedule)
 {
   a_time_range range = time_range_empty();
   a_schedule s = schedule_empty();

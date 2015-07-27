@@ -63,7 +63,7 @@ int test_hrs3_remaining_in()
 {
   struct tm ymdhms;
   time_t t = time(0);
-  localtime_r(&t, &ymdhms);
+  LOCALTIME_R(&t, &ymdhms);
 #define X(ret, x, h, m, s)                                   \
   do {                                                       \
     ymdhms.tm_hour = h;                                      \
@@ -87,7 +87,7 @@ int test_hrs3_remaining_out()
 {
   struct tm ymdhms;
   time_t t = time(0);
-  localtime_r(&t, &ymdhms);
+  LOCALTIME_R(&t, &ymdhms);
 #define X(ret, x, h, m, s)                                   \
   do {                                                       \
     ymdhms.tm_hour = h;                                      \
@@ -105,7 +105,7 @@ int test_hrs3_remaining_out()
   return 0;
 }
 
-void __attribute__((constructor)) test_hrs3()
+PRE_INIT(test_hrs3)
 {
   test_hrs3_remaining_in();
   test_hrs3_remaining_out();

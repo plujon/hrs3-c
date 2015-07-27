@@ -104,7 +104,7 @@ const struct tm *time_tm(const a_time *t)
 #if CHECK
     if (!t->time) BUG();
 #endif
-    localtime_r(&t->time, (struct tm *)&t->tm);
+    LOCALTIME_R(&t->time, (struct tm *)&t->tm);
   }
   return &t->tm;
 }
@@ -392,7 +392,7 @@ static void test_is_leap_year()
 #undef X
 }
 
-void __attribute__((constructor)) test_time()
+PRE_INIT(test_time)
 {
   test_time_();
   test_time_whms();

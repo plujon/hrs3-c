@@ -30,4 +30,6 @@ struct a_time_range;
 
 #include <stddef.h>
 
+#include "os.h"
+
 #endif /* __base_h__ */

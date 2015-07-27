@@ -276,7 +276,7 @@ void test_daily_remaining()
 #undef X
 }
 
-void __attribute__((constructor)) test_daily()
+PRE_INIT(test_daily)
 {
   test_day_init();
   test_day_merge();

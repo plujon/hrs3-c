@@ -132,7 +132,7 @@ int test_hrs3_kind()
   return 0;
 }
 
-void __attribute__((constructor)) test_hrs3_()
+PRE_INIT(test_hrs3_)
 {
   test_hrs3_kind();
 }

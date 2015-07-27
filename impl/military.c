@@ -447,7 +447,7 @@ void test_military_parse_range()
 #undef XX
 }
 
-void __attribute__((constructor)) test_military()
+PRE_INIT(test_military)
 {
   test_military_time_cmp();
   test_military_range_contains();

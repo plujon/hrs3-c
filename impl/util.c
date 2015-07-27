@@ -88,7 +88,7 @@ void test_beginning_of_week()
   if (tm->tm_sec) TFAIL();
 }
 
-void __attribute__((constructor)) test_util()
+PRE_INIT(test_util)
 {
   test_beginning_of_day();
   test_beginning_of_week();

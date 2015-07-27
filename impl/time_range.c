@@ -178,7 +178,7 @@ void test_time_range_parse()
 #undef BAD
 }
 
-void __attribute__((constructor)) test_time_range()
+PRE_INIT(test_time_range)
 {
   test_time_range_init();
   test_time_range_contains();

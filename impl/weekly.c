@@ -211,7 +211,7 @@ static void test_weekly_remaining()
 #undef BAD
 }
 
-void __attribute__((constructor)) test_weekly()
+PRE_INIT(test_weekly)
 {
   test_gobble_days();
   test_weekly_remaining();

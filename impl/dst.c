@@ -125,7 +125,7 @@ void test_dst_()
 #undef OUT
 }
 
-void __attribute__((constructor)) test_dst()
+PRE_INIT(test_dst)
 {
   test_dst_();
 }
