@@ -200,14 +200,14 @@ void test_day_init()
       TFAIL();                                                          \
     if (secs != result.seconds)                                         \
       TFAIL();                                                          \
-  } while(0)
+  } while_0
   X("830-12",  7,  0,  0, 0, 60 * 90);
 #undef X
 #define BAD(s) do {                                                     \
     a_day day;                                                          \
     if (OK == day_init(&day, s, sizeof(s)-1))                          \
       TFAIL();                                                          \
-  } while(0)
+  } while_0
   BAD("U");
   BAD("1");
   BAD("-");
@@ -224,7 +224,7 @@ void test_day_merge()
     day_merge(&a, &b);                                          \
     if (strcmp(day_to_s_dup(&a), AB))                           \
       TFAILF(" '%s' vs '%s'", day_to_s_dup(&a), AB);            \
-  } while(0)
+  } while_0
   X("6-7",       "8-9", "6-7&8-9");
   X("6-7",       "7-8", "6-8");
   X("6-730",     "7-8", "6-8");
@@ -245,7 +245,7 @@ void test_daily_remaining()
       TFAIL();                                                          \
     if (secs != result.seconds)                                         \
       TFAILF(" %d vs %d", secs, result.seconds);                        \
-  } while(0)
+  } while_0
   X("830-12",  7,  0,  0, 0, 60 * 90);
   X("830-12",  7,  0,  1, 0, 60 * 90 - 1);
   X("830-12",  7,  1,  0, 0, 60 * 89);

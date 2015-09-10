@@ -41,7 +41,7 @@ void test_dst_()
       TFAILF(" %s in schedule", (IS_IN ? "is not" : "is"));             \
     else if (SECS != result.seconds)                                    \
       TFAILF(" %d vs %d", SECS, result.seconds);                        \
-  } while(0)
+  } while_0
 #define IN(HRS3, T, T_OFFSET, SECS) X( HRS3, T, T_OFFSET, 1, SECS)
 #define OUT(HRS3, T, T_OFFSET, SECS) X( HRS3, T, T_OFFSET, 0, SECS)
   /*

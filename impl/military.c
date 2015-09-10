@@ -307,7 +307,7 @@ void test_military_time_cmp()
     if (ret != military_time_cmp(&mt1, &mt2)) {         \
       TFAIL();                                          \
     }                                                   \
-  } while(0)
+  } while_0
   X( 0, 8, 30, 8, 30);
   X(-1, 8, 30, 8, 31);
   X( 1, 8, 31, 8, 30);
@@ -327,7 +327,7 @@ void test_military_range_contains()
     if (x) TFAILF(" at line %d", x);                                 \
     if (RET != military_range_contains(&range, &time))               \
       TFAIL();                                                       \
-  } while(0)
+  } while_0
   X( 0, "830-831", "831");
   X( 1, "830-831", "830");
 #undef X
@@ -350,7 +350,7 @@ void test_military_parse_time()
         TFAIL();                                        \
       }                                                 \
     }                                                   \
-  } while(0)
+  } while_0
   X(0, "0", 0, 0);
   X(0, "0", 0, 0);
   X(0, "1", 1, 0);
@@ -385,7 +385,7 @@ void test_military_time_to_s()
     buffer[sizeof(EXPECTED)-1] = 0;                               \
     if (strcmp(buffer, EXPECTED))                                 \
       TFAILF(" %s vs %s", buffer, EXPECTED);                      \
- } while (0)
+ } while_0
   X("8"   , "8");
   X("0800", "8");
   X("08"  , "8");
@@ -406,7 +406,7 @@ void test_military_range_to_s()
     buffer[sizeof(EXPECTED)-1] = 0;                                 \
     if (strcmp(buffer, EXPECTED))                                   \
       TFAILF(" %s vs %s", buffer, EXPECTED);                        \
-  } while (0)
+  } while_0
   X("8-9"      , "8-9");
   X("0800-0900", "8-9");
   X("08-9"     , "8-9");
@@ -429,7 +429,7 @@ void test_military_parse_range()
       if (military_range_cmp(&mr, &control))                    \
         TFAIL();                                                \
     }                                                           \
-  } while (0)
+  } while_0
 #define X(ret,s,h1,m1,h2,m2) XX(ret,s,sizeof(s)-1,h1,m1,h2,m2)
   X(0, "0-1",        0,  0,  1,  0);
   X(0, "0000-1000",  0,  0,  1,  0);

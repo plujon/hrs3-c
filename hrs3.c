@@ -71,7 +71,7 @@ int test_hrs3_remaining_in()
     ymdhms.tm_sec = s;                                       \
     t = mktime(&ymdhms);                                     \
     if (ret != hrs3_remaining_in(x, t)) TFAIL();             \
-  } while(0)
+  } while_0
   X(0,    "9-10",  8, 59, 59);
   X(3600, "9-10",  9,  0,  0);
   X(3599, "9-10",  9,  0,  1);
@@ -95,7 +95,7 @@ int test_hrs3_remaining_out()
     ymdhms.tm_sec = s;                                       \
     t = mktime(&ymdhms);                                     \
     if (ret != hrs3_remaining_out(x, t)) TFAIL();            \
-  } while(0)
+  } while_0
   X(   1, "9-10",  8, 59, 59);
   X(   0, "9-10",  9,  0,  0);
   X(   0, "9-10",  9, 59, 59);

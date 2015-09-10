@@ -145,7 +145,7 @@ static void test_gobble_days()
     a_day_mask mask;                                    \
     if (LEN != gobble_days(S, LEN, &mask)) TFAIL();     \
     if ((MASK) != mask) TFAIL();                        \
-  } while (0)
+  } while_0
   X("U1-2", 1, SUNDAY);
   X("UM1-2", 2, SUNDAY | MONDAY);
   X("UU1-2", 2, SUNDAY);
@@ -202,7 +202,7 @@ static void test_weekly_remaining()
     a_time t = time_clone(time_now());                                \
     a_remaining_result result = hrs3_remaining_(hrsss, time_time(&t)); \
     if (result.is_valid) TFAIL();                                       \
-  } while(0)
+  } while_0
   BAD("U");
   BAD("U1");
   BAD("U-");

@@ -161,7 +161,7 @@ void test_time_range_parse()
     } else {                                                   \
       TFAIL();                                                 \
     }                                                          \
-  } while(0)
+  } while_0
 #define X(x) XX(x, x)
   X("20150528162400-20150528162500");
   X("20150101010100-20151231235900");
@@ -170,7 +170,7 @@ void test_time_range_parse()
 #define BAD(x) do {                                                   \
     if (OK == time_range_parse(&range, x, sizeof(x) - 1))             \
       TFAIL();                                                        \
-  } while(0)
+  } while_0
   BAD("20150101010200-20150101010100");
   BAD("20150101010200-20150101010200");
   BAD("20150101010200-20150101016000");

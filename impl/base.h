@@ -2,8 +2,8 @@
 #define __base_h__
 
 #define DIM(x) sizeof(x)/sizeof(x[0])
-#define CRASH() do { char *p = 0; *p = 'a'; } while(0)
-#define NOD(x) do { status _x = x; if (OK != _x) return _x; } while (0)
+#define CRASH() do { char *p = 0; *p = 'a'; } while_0
+#define NOD(x) do { status _x = x; if (OK != _x) return _x; } while_0
 #if TEST
 #  ifndef CHECK
 #  define CHECK 1
@@ -19,6 +19,7 @@
 #define OK 0
 #define true 1
 #define false 0
+#define while_0 while ((void)0,0)
 
 typedef int status;
 typedef int bool;

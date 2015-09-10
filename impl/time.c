@@ -339,7 +339,7 @@ static void test_time_ymdhms()
         tm->tm_min != min ||                                          \
         tm->tm_sec != sec)                                            \
       TFAIL();                                                        \
-  } while(0)
+  } while_0
   X(2015, 06, 01, 17, 26, 46);
   X(2015, 01, 01, 01, 01, 01);
   X(2015, 12, 31, 11, 59, 59);
@@ -359,7 +359,7 @@ static void test_time_whms()
     if (tm->tm_sec != sec) TFAILF(" sec %d vs %d", tm->tm_sec, sec); \
     if (tm->tm_min != min) TFAILF(" min %d vs %d", tm->tm_min, min); \
     if (tm->tm_hour != hour) TFAILF(" hour %d vs %d", tm->tm_hour, hour); \
-  } while (0)
+  } while_0
   X(0, 0, 0, 0);
   X(1, 1, 1, 1);
   X(6, 23, 59, 59);
@@ -371,7 +371,7 @@ static void test_time_parse()
   a_time t_, *t = &t_;
 #define X(S) do {                                                     \
     if (time_parse(t, S, sizeof(S) - 1)) TFAIL();                     \
-  } while (0)
+  } while_0
   X("20150611163613");
   X("20150111163613");
   X("20151211163613");

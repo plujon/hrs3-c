@@ -179,7 +179,7 @@ PRE_INIT(test_schedule)
     schedule_insert(&s, &r);                                            \
     if (num != s.n_ranges)                                              \
       TFAILF(" %d vs %d in %s", num, s.n_ranges, schedule_to_s_(&s));   \
-  } while (0)
+  } while_0
   X(&now, 10, 1);
   time_range_init(&range, &now, 10);
   if (!schedule_has_range(&s, &range)) TFAIL();

@@ -20,7 +20,7 @@ void test_raw_remaining()
     if (result.time_is_in_schedule != is_in_schedule)                   \
       TFAIL();                                                          \
     if (result.seconds != secs) TFAIL();                                \
-  } while(0)
+  } while_0
   X("20150429120000-20150429120001", "20150429120000", 1, 1);
   X("20150429120000-20150429120001", "20150429120001", 0, 0);
   X("20150429120000-20150429120001", "20150429115959", 0, 1);
