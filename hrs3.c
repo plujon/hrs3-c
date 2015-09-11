@@ -33,7 +33,7 @@ static a_remaining_result hrs3_remaining_(const char *hrsss_in, time_t time)
   if (strchr(hrsss_in, ':')) {
     char *s = strdup(hrsss_in);
     remove_char(s, ':');
-    hrsss = s; 
+    hrsss = s;
   }
   a_remaining_result result = hrs3_remaining__(hrsss, time);
   if (hrsss != hrsss_in)
