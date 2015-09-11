@@ -5,6 +5,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if _WIN32
+#define strdup _strdup
+#endif
+
 void day_clone(a_day *dest, const a_day *src)
 {
   if (dest->ranges) {
@@ -43,7 +47,7 @@ void day_destroy(a_day *day)
 void day_coallesce(a_day *day)
 {
   a_military_range *prev = 0;
-  size_t i = 0;
+  int i = 0;
   for (; i < day->n_ranges; ++i) {
     a_military_range *range = &day->ranges[i];
     if (prev) {
@@ -87,7 +91,7 @@ void day_insert_at(a_day *day, size_t index, const a_military_range *insertee)
 
 void day_insert(a_day *dest, const a_military_range *range)
 {
-  size_t i = 0;
+  int i = 0;
   for (; i < dest->n_ranges; ++i) {
     a_military_range *x = &dest->ranges[i];
     if (military_range_overlaps_or_abuts(range, x)) {
@@ -111,7 +115,7 @@ void day_merge(a_day *dest, const a_day *src)
   while (dest->capacity < dest->n_ranges + src->n_ranges) {
     day_grow(dest);
   }
-  size_t i = 0;
+  int i = 0;
   for (; i < src->n_ranges; ++i) {
     a_military_range *range = &src->ranges[i];
     day_insert(dest, range);
@@ -155,7 +159,7 @@ status day_init(a_day *day, const char *s, size_t len)
 size_t day_to_s(a_day *day, char *buffer)
 {
   size_t offset = military_range_to_s(&day->ranges[0], &buffer[0]);
-  size_t i = 1;
+  int i = 1;
   for (; i < day->n_ranges; ++i) {
     buffer[offset++] = '&';
     offset += military_range_to_s(&day->ranges[i], &buffer[offset]);
@@ -173,7 +177,7 @@ char *day_to_s_dup(a_day *day)
 
 void day_add_to_schedule(const a_day *day, const a_time *t, a_schedule *schedule)
 {
-  size_t i = 0;
+  int i = 0;
   for (; i < day->n_ranges; ++i) {
     a_military_range *range = &day->ranges[i];
     a_time_range time_range_, *time_range = &time_range_;

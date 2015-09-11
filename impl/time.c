@@ -24,7 +24,7 @@ int time_cmp(const a_time *a, const a_time *b)
 
 int time_diff(const a_time *later, const a_time *earlier)
 {
-  return time_time(later) - time_time(earlier);
+  return (int)(time_time(later) - time_time(earlier));
 }
 
 bool time_precedes(const a_time *earlier, const a_time *later)

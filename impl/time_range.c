@@ -72,7 +72,7 @@ status time_range_parse(a_time_range *range, const char *s, size_t len)
   const char *dash = strnchr(s, len, '-');
   if (!dash)
     return __LINE__;
-  ptrdiff_t dash_offset = dash - s;
+  size_t dash_offset = dash - s;
   if (len <= dash_offset)
     return __LINE__;
   NOD(time_parse(&range->start, s, dash_offset));

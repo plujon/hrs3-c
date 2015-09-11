@@ -4,6 +4,10 @@
 #include "impl/impl.h"
 #include <string.h>
 
+#if _WIN32
+#define strdup _strdup
+#endif
+
 /*
  * hrs3_remaining evaluates whether t falls within the schedule noted
  * by hrsss.  The return value x indicates both (a) whether t is within

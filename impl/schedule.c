@@ -43,11 +43,6 @@ void schedule_grow(a_schedule *schedule)
   }
 }
 
-bool schedule_contains(a_schedule *schedule, a_time *t)
-{
-  return false;
-}
-
 bool schedule_has_range(a_schedule *schedule, a_time_range *range)
 {
   int i = 0;

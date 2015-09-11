@@ -13,7 +13,7 @@ a_military_time military_midnight()
   return x;
 }
 
-static int to_int(char c)
+static char to_numeric(char c)
 {
   return c - '0';
 }
@@ -109,20 +109,20 @@ status military_parse_time(a_military_time *time, const char *s, int len)
     BUG();
 #endif
   if (time) {
-    time->hour = -1;
-    time->minute = -1;
+    time->hour = (unsigned char)-1;
+    time->minute = (unsigned char)-1;
   }
   a_mil_string milstr;
   if (military_fill(s, len, milstr))
     return __LINE__;
-  int hour = 0;
-  int minute = 0;
+  unsigned char hour = 0;
+  unsigned char minute = 0;
   size_t i = 0;
   for (; i < 2; ++i) {
     char c = milstr[i];
     if (!isdigit(c))
       return __LINE__;
-    hour = 10 * hour + to_int(c);
+    hour = 10 * hour + to_numeric(c);
   }
   if (24 < hour)
     return __LINE__;
@@ -130,7 +130,7 @@ status military_parse_time(a_military_time *time, const char *s, int len)
     char c = milstr[i];
     if (!isdigit(c))
       return __LINE__;
-    minute = 10 * minute + to_int(c);
+    minute = 10 * minute + to_numeric(c);
   }
   if (59 < minute)
     return __LINE__;

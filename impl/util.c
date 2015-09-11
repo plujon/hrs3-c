@@ -39,7 +39,7 @@ int s_to_d(const char *s, size_t len)
 
 void dd_to_s(char *buffer, int value)
 {
-  buffer[0] = '0' + value / 10;
+  buffer[0] = '0' + (char)value / 10;
   buffer[1] = '0' + value % 10;
 }
 
