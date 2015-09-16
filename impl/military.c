@@ -179,7 +179,7 @@ bool military_time_to_time_no_dst_adjust(const a_military_time *military_time,
     return true;
   time_copy(t, &clone);
   return false;
-} 
+}
 
 bool military_time_to_time(const a_military_time *src,
                            const a_time *date,
@@ -207,7 +207,7 @@ bool military_range_to_time_range(const a_military_range *military_range,
     return false;
   }
   return true;
-} 
+}
 
 size_t military_time_to_s(const a_military_time* time, char *buffer)
 {
