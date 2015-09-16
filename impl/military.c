@@ -18,7 +18,7 @@ static char to_numeric(char c)
   return c - '0';
 }
 
-static status military_fill(const char *s, int len, a_mil_string milstr)
+static status military_fill(const char *s, size_t len, a_mil_string milstr)
 {
   if (!s || !*s)
     return __LINE__;
@@ -102,10 +102,10 @@ bool military_range_contains(const a_military_range *range, const a_military_tim
           military_time_cmp(time, &range->stop) < 0) ? true : false;
 }
 
-status military_parse_time(a_military_time *time, const char *s, int len)
+status military_parse_time(a_military_time *time, const char *s, size_t len)
 {
 #if CHECK
-  if (len < 0)
+  if (0x800000 < len)
     BUG();
 #endif
   if (time) {
@@ -143,7 +143,7 @@ status military_parse_time(a_military_time *time, const char *s, int len)
   return 0;
 }
 
-status military_parse_range(a_military_range* range, const char *s, int len)
+status military_parse_range(a_military_range* range, const char *s, size_t len)
 {
   if (!s || !*s)
     return __LINE__;
@@ -152,7 +152,7 @@ status military_parse_range(a_military_range* range, const char *s, int len)
   a_military_time *stop = range ? &range->stop : &dummy;
   const char *end = s + len;
   const char *dash = strchr(s, '-');
-  size_t dash_offset = dash - s;
+  ptrdiff_t dash_offset = dash - s;
   if (!dash || end <= dash)
     return __LINE__;
   if (military_parse_time(start, s, dash_offset))

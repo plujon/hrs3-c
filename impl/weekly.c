@@ -129,7 +129,7 @@ status week_init(a_week *week, const char *s, size_t len)
 void week_add_to_schedule(const a_week *week, const a_time *t, a_schedule *schedule)
 {
   a_time date_ = time_clone(t), *date = &date_;
-  size_t i = 0;
+  int i = 0;
   for (; i < DIM(week->days); ++i) {
     const a_day *day = &week->days[i];
     if (0 == day->n_ranges) continue;
