@@ -163,9 +163,21 @@ static int thwr_aux(const char *hrsss,
   a_time t = time_clone(time_now());
   time_whms(&t, wday, hour, minute, second);
   a_remaining_result result = hrs3_remaining_(hrsss, time_time(&t));
-  return (expected.is_valid == result.is_valid &&
-          expected.time_is_in_schedule == result.time_is_in_schedule &&
-          expected.seconds == result.seconds) ? 0 : 1;
+  if (expected.is_valid != result.is_valid)
+    return __LINE__;
+  if (expected.time_is_in_schedule != result.time_is_in_schedule)
+    return __LINE__;
+  if (expected.seconds == result.seconds)
+    return 0;
+  if (expected.seconds + 3600 == result.seconds ||
+      result.seconds + 3600 == expected.seconds) {
+    /* Hack to avoid spurious failures; assume dst */
+    int is_dst = time_tm(&t)->tm_isdst;
+    time_incr(&t, seconds);
+    if (time_tm(&t)->tm_isdst != is_dst)
+      return 0;
+  }
+  return __LINE__;
 }
 
 static void test_weekly_remaining()
