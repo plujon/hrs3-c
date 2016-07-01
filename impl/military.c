@@ -50,7 +50,7 @@ static status military_fill(const char *s, size_t len, a_mil_string milstr)
   default:
     return NO;
   }
-  return 0;
+  return OK;
 }
 
 int military_time_cmp(const a_military_time *a, const a_military_time *b)
@@ -140,7 +140,7 @@ status military_parse_time(a_military_time *time, const char *s, size_t len)
     time->hour = hour;
     time->minute = minute;
   }
-  return 0;
+  return OK;
 }
 
 status military_parse_range(a_military_range* range, const char *s, size_t len)
@@ -162,7 +162,7 @@ status military_parse_range(a_military_range* range, const char *s, size_t len)
     return NO;
   if (0 <= military_time_cmp(start, stop))
     return NO;
-  return 0;
+  return OK;
 }
 
 /*

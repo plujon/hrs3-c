@@ -84,7 +84,7 @@ int test_hrs3_remaining_in()
   X(   0, "9:00-10:00", 10,  0,  0);
   X(  -1, "abc",   0,  0,  0);
 #undef X
-  return 0;
+  return OK;
 }
 
 int test_hrs3_remaining_out()
@@ -106,7 +106,7 @@ int test_hrs3_remaining_out()
   X(3600 * 23, "9-10", 10,  0,  0);
   X(  -1, "abc",   0,  0,  0);
 #undef X
-  return 0;
+  return OK;
 }
 
 PRE_INIT(test_hrs3)

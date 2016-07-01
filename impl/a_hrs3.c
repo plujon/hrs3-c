@@ -129,7 +129,7 @@ int test_hrs3_kind()
   X(Raw == hrs3_kind("_20150516121900-20150516122000"));
   X(Raw == hrs3_kind("_1900-2100"));
 #undef X
-  return 0;
+  return OK;
 }
 
 PRE_INIT(test_hrs3_)
