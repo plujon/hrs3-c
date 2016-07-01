@@ -138,7 +138,7 @@ status day_parse_single(a_day *day, const char *s, size_t len)
 status day_init(a_day *day, const char *s, size_t len)
 {
   if (!s || !*s)
-    return __LINE__;
+    return NO;
   const char *amp = strnchr(s, len, '&');
   if (amp) {
     size_t offset = amp - s;

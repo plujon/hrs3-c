@@ -89,7 +89,7 @@ status week_parse_single(a_week *week, const char *s, size_t len)
   a_day_mask mask;
   size_t offset = gobble_days(s, len, &mask);
   if (0 == offset)
-    return __LINE__;
+    return NO;
   s += offset;
   len -= offset;
   a_day day;
@@ -164,9 +164,9 @@ static int thwr_aux(const char *hrsss,
   time_whms(&t, wday, hour, minute, second);
   a_remaining_result result = hrs3_remaining_(hrsss, time_time(&t));
   if (expected.is_valid != result.is_valid)
-    return __LINE__;
+    return NO;
   if (expected.time_is_in_schedule != result.time_is_in_schedule)
-    return __LINE__;
+    return NO;
   if (expected.seconds == result.seconds)
     return 0;
   if (expected.seconds + 3600 == result.seconds ||
@@ -177,7 +177,7 @@ static int thwr_aux(const char *hrsss,
     if (time_tm(&t)->tm_isdst != is_dst)
       return 0;
   }
-  return __LINE__;
+  return NO;
 }
 
 static void test_weekly_remaining()

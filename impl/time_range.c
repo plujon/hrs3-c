@@ -63,7 +63,7 @@ void time_range_init(a_time_range *range, const a_time *start, int seconds)
 status time_range_verify(a_time_range *range)
 {
   if (0 <= time_cmp(&range->start, &range->stop))
-    return __LINE__;
+    return NO;
   return OK;
 }
 
@@ -71,10 +71,10 @@ status time_range_parse(a_time_range *range, const char *s, size_t len)
 {
   const char *dash = strnchr(s, len, '-');
   if (!dash)
-    return __LINE__;
+    return NO;
   size_t dash_offset = dash - s;
   if (len <= dash_offset)
-    return __LINE__;
+    return NO;
   NOD(time_parse(&range->start, s, dash_offset));
   len -= dash_offset - 1;
   s += dash_offset + 1;

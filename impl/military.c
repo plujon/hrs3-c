@@ -21,7 +21,7 @@ static char to_numeric(char c)
 static status military_fill(const char *s, size_t len, a_mil_string milstr)
 {
   if (!s || !*s)
-    return __LINE__;
+    return NO;
   switch (len) {
   case 1: /* 8 */
     milstr[0] = '0';
@@ -48,7 +48,7 @@ static status military_fill(const char *s, size_t len, a_mil_string milstr)
     milstr[3] = s[3];
     break;
   default:
-    return __LINE__;
+    return NO;
   }
   return 0;
 }
@@ -114,28 +114,28 @@ status military_parse_time(a_military_time *time, const char *s, size_t len)
   }
   a_mil_string milstr;
   if (military_fill(s, len, milstr))
-    return __LINE__;
+    return NO;
   unsigned char hour = 0;
   unsigned char minute = 0;
   size_t i = 0;
   for (; i < 2; ++i) {
     char c = milstr[i];
     if (!isdigit(c))
-      return __LINE__;
+      return NO;
     hour = 10 * hour + to_numeric(c);
   }
   if (24 < hour)
-    return __LINE__;
+    return NO;
   for (; i < 4; ++i) {
     char c = milstr[i];
     if (!isdigit(c))
-      return __LINE__;
+      return NO;
     minute = 10 * minute + to_numeric(c);
   }
   if (59 < minute)
-    return __LINE__;
+    return NO;
   if (24 == hour && 0 != minute)
-    return __LINE__;
+    return NO;
   if (time) {
     time->hour = hour;
     time->minute = minute;
@@ -146,7 +146,7 @@ status military_parse_time(a_military_time *time, const char *s, size_t len)
 status military_parse_range(a_military_range* range, const char *s, size_t len)
 {
   if (!s || !*s)
-    return __LINE__;
+    return NO;
   a_military_time dummy;
   a_military_time *start = range ? &range->start : &dummy;
   a_military_time *stop = range ? &range->stop : &dummy;
@@ -154,14 +154,14 @@ status military_parse_range(a_military_range* range, const char *s, size_t len)
   const char *dash = strchr(s, '-');
   ptrdiff_t dash_offset = dash - s;
   if (!dash || end <= dash)
-    return __LINE__;
+    return NO;
   if (military_parse_time(start, s, dash_offset))
-    return __LINE__;
+    return NO;
   s = dash + 1;
   if (military_parse_time(stop, s, end - s))
-    return __LINE__;
+    return NO;
   if (0 <= military_time_cmp(start, stop))
-    return __LINE__;
+    return NO;
   return 0;
 }
 

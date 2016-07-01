@@ -100,7 +100,7 @@ status hrs3_init(a_hrs3 *hrs3, const char *hrsss, size_t len)
   case Daily: return hrs3_parse_daily(hrs3, hrsss, len);
   case Weekly: return hrs3_parse_weekly(hrs3, hrsss, len);
   case Raw: return hrs3_parse_raw(hrs3, hrsss, len);
-  default: return __LINE__;
+  default: return NO;
   }
 }
 

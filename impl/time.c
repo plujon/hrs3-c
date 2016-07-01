@@ -277,21 +277,21 @@ status time_parse(a_time *out, const char *s, size_t len)
 {
   memset(out, 0, sizeof(a_time));
   if (len < time_string_length()) {
-    return __LINE__;
+    return NO;
   }
   int year = s_to_d(s, 4); s += 4;
   int mon = s_to_d(s, 2); s += 2;
-  if (mon <= 0 || 13 <= mon) return __LINE__;
+  if (mon <= 0 || 13 <= mon) return NO;
   int day = s_to_d(s, 2); s += 2;
-  if (day < 0 ||  days_in_mon(mon, year) < day) return __LINE__;
+  if (day < 0 ||  days_in_mon(mon, year) < day) return NO;
   int hour = s_to_d(s, 2); s += 2;
-  if (hour < 0 || 24 <= hour) return __LINE__;
+  if (hour < 0 || 24 <= hour) return NO;
   int minute = s_to_d(s, 2); s += 2;
-  if (minute < 0 || 60 <= minute) return __LINE__;
+  if (minute < 0 || 60 <= minute) return NO;
   int second = s_to_d(s, 2); s += 2;
   time_copy(out, time_now());
   if (!time_ymdhms(out, year, mon, day, hour, minute, second))
-    return __LINE__;
+    return NO;
   return OK;
 }
 

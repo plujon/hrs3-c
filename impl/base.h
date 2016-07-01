@@ -17,6 +17,7 @@
 #endif
 #define ONE_OBJ 1
 #define OK 0
+#define NO 0 - __LINE__
 #define true 1
 #define false 0
 #define while_0 while ((void)0,0)
