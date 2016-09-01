@@ -3,6 +3,7 @@
 #include "main.c"
 #include "military.c"
 #include "raw.c"
+#include "now.c"
 #include "remaining.c"
 #include "schedule.c"
 #include "time_range.c"

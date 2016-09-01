@@ -1,4 +1,5 @@
 # hrs3-c
+
 C library for hrs3 (human readable small schedule string) schedules
 
 ## What is hrs3?
@@ -9,12 +10,15 @@ Here are some examples:
 * 10-12: 10am to 12pm
 * MWF10-12: Monday, Wednesday, and Friday, 10am to 12pm
 * M1330-1400: Monday 13:00 to 14:00 (1:30pm to 2:00pm)
+* MWF: Monday, Wednesday, and Friday, all day, same as MWF0-24
+* now+2h: Now to 2 hours from now
+* 20150429120000-20150429120001: 2015-04-29 12:00:00 to 2015-04-29 12:00:01
 
-Daily, week-daily, weekly, biweekly, and raw are all part of hrs3.
+Daily, week-daily, weekly, biweekly, now, and raw are all part of hrs3.
 
 See hrs3.bnf or hrs3.ebnf for official grammar.
 
-This library does not implement biweekly schedules.
+This library does not implement week-daily or biweekly schedules.
 
 ## How to use
 

@@ -145,11 +145,12 @@ size_t schedule_to_s(const a_schedule *schedule, char *buffer, size_t size)
   size_t offset = 0;
   int i = 0;
   for(; i < schedule->n_ranges; ++i) {
+    if (1 <= i && size < offset)
+      buffer[offset++] = ' ';
     a_time_range *x = &schedule->ranges[i];
-    if (size <= offset + TIME_RANGE_STR_SIZE + 1)
+    if (size < offset + TIME_RANGE_STR_SIZE + 1)
       break;
     offset += time_range_to_s(x, &buffer[offset]);
-    buffer[offset++] = ' ';
   }
   return offset;
 }

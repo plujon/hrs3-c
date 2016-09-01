@@ -8,8 +8,11 @@ a_hrs3_kind hrs3_kind(const char *s)
 {
   if (!s) return Invalid;
   const char *dash = strchr(s, '-');
-  if (!dash)
+  if (!dash) {
+    if ('n' == s[0] && 'o' == s[1] && 'w' == s[2] && '+' == s[3])
+      return Now;
     return Invalid;
+  }
   char c = *s;
   if ('0' <= c && c <= '9') {
     /*
@@ -57,12 +60,19 @@ static status hrs3_parse_raw(a_hrs3 *hrs3, const char *hrsss, size_t len)
   return time_range_parse(time_range, hrsss, len);
 }
 
+static status hrs3_parse_now(a_hrs3 *hrs3, const char *hrsss, size_t len)
+{
+  a_now_range now_range_, *now_range = hrs3 ? &hrs3->now_range : &now_range_;
+  return now_init(now_range, hrsss, len);
+}
+
 void hrs3_add_to_schedule(a_hrs3 *hrs3, const a_time *t, a_schedule *schedule)
 {
   switch(hrs3->kind) {
   case Daily: day_add_to_schedule(&hrs3->day, t, schedule); break;
   case Weekly: week_add_to_schedule(&hrs3->week, t, schedule); break;
   case Raw: schedule_insert(schedule, &hrs3->time_range); break;
+  case Now: now_add_to_schedule(&hrs3->now_range, t, schedule); break;
   default: break;
   }
 }
@@ -100,6 +110,7 @@ status hrs3_init(a_hrs3 *hrs3, const char *hrsss, size_t len)
   case Daily: return hrs3_parse_daily(hrs3, hrsss, len);
   case Weekly: return hrs3_parse_weekly(hrs3, hrsss, len);
   case Raw: return hrs3_parse_raw(hrs3, hrsss, len);
+  case Now: return hrs3_parse_now(hrs3, hrsss, len);
   default: return NO;
   }
 }
@@ -110,6 +121,7 @@ void hrs3_destroy(a_hrs3 *hrs3)
   case Daily: day_destroy(&hrs3->day); break;
   case Weekly: week_destroy(&hrs3->week); break;
   case Raw: break;
+  case Now: now_destroy(&hrs3->now_range); break;
   default: break;
   }
   hrs3->kind = Invalid;
@@ -128,6 +140,7 @@ int test_hrs3_kind()
   X(Raw == hrs3_kind("20150516121900-20150516122000"));
   X(Raw == hrs3_kind("_20150516121900-20150516122000"));
   X(Raw == hrs3_kind("_1900-2100"));
+  X(Now == hrs3_kind("now+30m"));
 #undef X
   return OK;
 }

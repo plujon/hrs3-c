@@ -5,6 +5,7 @@
 #include "remaining.h"
 #include "time_range.h"
 #include "weekly.h"
+#include "now.h"
 
 /*
  * hrs3 - An intermediate form for parsed hrs3 strings.
@@ -17,7 +18,8 @@ typedef enum a_hrs3_kind {
   Weekdaily,
   Weekly,
   Biweekly,
-  Raw
+  Raw,
+  Now
 } a_hrs3_kind;
 
 typedef struct a_hrs3 {
@@ -26,6 +28,7 @@ typedef struct a_hrs3 {
     a_day day;
     a_week week;
     a_time_range time_range;
+    a_now_range now_range;
   };
 } a_hrs3;
 

@@ -26,14 +26,20 @@ int c_to_d(char c)
   return 0;
 }
 
-int s_to_d(const char *s, size_t len)
+int s_to_d(const char *s, size_t len, char **endptr)
 {
   int ret = 0;
   const char *end = s + len;
   for(; s < end; ++s) {
+    char c = *s;
+    int d = c_to_d(c);
+    if (0 == d && '0' != c)
+      break;
     ret *= 10;
-    ret += c_to_d(*s);
+    ret += d;
   }
+  if (endptr)
+    *endptr = (char *)s;
   return ret;
 }
 
