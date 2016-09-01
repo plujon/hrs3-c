@@ -228,7 +228,9 @@ PRE_INIT(test_weekly)
   test_gobble_days();
   test_weekly_remaining();
 }
+#endif
 
+#if ONE_OBJ
 #include "daily.c"
 #include "util.c"
 #include "time_range.c"

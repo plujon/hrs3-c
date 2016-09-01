@@ -31,7 +31,9 @@ PRE_INIT(test_raw)
 {
   test_raw_remaining();
 }
+#endif
 
+#if ONE_OBJ
 #include "remaining.c"
 #include "time_range.c"
 #include "util.c"
