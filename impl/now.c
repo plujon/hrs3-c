@@ -9,33 +9,31 @@
  *
  * Here are some example nuns:
  *
+ *   1d - represents 1 day
  *   1h - represents 1 hour
  *   2m - represents 2 minutes
  *   3s - represents 3 seconds
  */
-static size_t now_parse_nun(const char *s, size_t len, int *acc)
+static size_t now_parse_nun(a_now_range *now_range, const char *s, size_t len)
 {
   char *end = 0;
   int num = s_to_d(s, len, &end);
   if (0 == num && s == end)
     return 0;
   switch (*end++) {
-  case 'h': num *= 3600; break;
-  case 'm': num *= 60  ; break;
-  case 's': num *= 1   ; break;
+  case 'd': now_range->days += num           ; break;
+  case 'h': now_range->seconds += 3600 * num ; break;
+  case 'm': now_range->seconds +=   60 * num ; break;
+  case 's': now_range->seconds +=    1 * num ; break;
   default: return 0;
   }
-  if (acc)
-    *acc += num;
   return end - s;
 }
 
-static status now_parse_nuns(int *seconds, const char *s, size_t len)
+static status now_parse_nuns(a_now_range *now_range, const char *s, size_t len)
 {
-  if (seconds)
-    *seconds = 0;
   for (; len;) {
-    size_t n_gobbled = now_parse_nun(s, len, seconds);
+    size_t n_gobbled = now_parse_nun(now_range, s, len);
     if (0 == n_gobbled)
       break;
     if (len < n_gobbled) {
@@ -52,6 +50,11 @@ static status now_parse_nuns(int *seconds, const char *s, size_t len)
 
 status now_init(a_now_range *now_range, const char *s, size_t len)
 {
+  a_now_range dummy_;
+  if (!now_range)
+    now_range = &dummy_;
+  now_range->seconds = 0;
+  now_range->days = 0;
   if (!s) return NO;
   if (len < 6) return NO; /* now+1s */
   if ('n' != *s++ ||
@@ -60,8 +63,7 @@ status now_init(a_now_range *now_range, const char *s, size_t len)
       '+' != *s++)
     return NO;
   len -= 4;
-  int *seconds = now_range ? &now_range->seconds : 0;
-  return now_parse_nuns(seconds, s, len);
+  return now_parse_nuns(now_range, s, len);
 }
 
 void now_destroy(a_now_range *now_range)
@@ -71,7 +73,10 @@ void now_destroy(a_now_range *now_range)
 
 void now_to_time_range(const a_now_range *now_range, const a_time *time, struct a_time_range *range)
 {
-  time_range_init(range, time, now_range->seconds);
+  time_range_init(range, time, 0);
+  if (0 != now_range->days)
+    time_incr_days(&range->stop, now_range->days);
+  time_incr(&range->stop, now_range->seconds);
 }
 
 void now_add_to_schedule(const a_now_range *now_range, const a_time *time, struct a_schedule *schedule)

@@ -3,6 +3,7 @@
 
 typedef struct a_now_range {
   int seconds;
+  int days;
 } a_now_range;
 
 status now_init(a_now_range *now_range, const char *s, size_t len);

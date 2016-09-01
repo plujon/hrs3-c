@@ -51,6 +51,27 @@ void time_incr(a_time *t, int sec)
   }
 }
 
+void time_incr_days(a_time *t, int days)
+{
+  /*
+   * Adjust t by N days, taking into account DST.
+   */
+  if (0 == days)
+    return;
+  a_time old = time_clone(t);
+  int old_hour = time_tm(&old)->tm_hour;
+  time_incr(t, days * 3600 * 24);
+  int new_hour = time_tm(t)->tm_hour;
+  if (new_hour <= 1 && 22 <= old_hour)
+    time_incr(t, -3600 * 2); /* DST oops, go back a bit */
+  else if (22 <= new_hour && old_hour <= 2)
+    time_incr(t,  3600 * 2); /* DST oops, go forward a bit */
+  time_hms(t,
+           time_tm(&old)->tm_hour,
+           time_tm(&old)->tm_min,
+           time_tm(&old)->tm_sec);
+}
+
 void time_next_day(a_time *t)
 {
   /*

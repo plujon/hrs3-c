@@ -45,10 +45,10 @@ void test_dst_()
 #define IN(HRS3, T, T_OFFSET, SECS) X( HRS3, T, T_OFFSET, 1, SECS)
 #define OUT(HRS3, T, T_OFFSET, SECS) X( HRS3, T, T_OFFSET, 0, SECS)
   /*
-   * In the fall, 1am to 2am happens twice on a certain day, and in
-   * the spring, 2am to 3am is skipped on a certain day (spring
-   * forward, fall back).  The following tests verify that hrs3
-   * handles schedules that
+   * In the spring, 2am to 3am is skipped on a certain day, and in the
+   * fall, 1am to 2am happens twice on a certain day (spring forward,
+   * fall back).  The following tests verify that hrs3 handles
+   * schedules that
    *
    * 1. occur during part or all of one of the 2 "weird" periods.
    *
@@ -56,17 +56,13 @@ void test_dst_()
    * remaining result needs to take the weird periods into account
    * (and have either one more hour or one less hour).
    */
-  /* Schedules that occur during 1am to 2am, etc. */
-  /* Schedules that straddle 2am to 3am */
-  /* Schedules that are before 2am, and remaining before, during, and after */
-  /* Schedules that are after 3am, and remaining before, during, and after */
-  /* Schedules that are after 2am to 3am and the  */
+
   /* SPRING FORWARD at 2015-03-08 02:00:00 */
 #define DATE "20150308"
   /* at 1:59:59 */
   /* hrs3 straddling 2am */
   X("1:59-2:00", "01:59:59", 0, 1, 1);
-  X("1:59-2:01", "01:59:59", 0, 1, 61);
+  X("1:59-2:01", "01:59:59", 0, 1, 61); /* shouldn't this be 1 second, not 61? */
   X("1:59-3:00", "01:59:59", 0, 1, 1);
   X("1:59-3:01", "01:59:59", 0, 1, 1 + 60);
 
@@ -86,8 +82,11 @@ void test_dst_()
 
   /* TODO: raw, weekly, biweekly, and weekdaily schedules */
 
-  /* FALL BACK at 2015-11-01 02:00:00 */
+  X("now+1d", "01:59:59", 0, 1, 23 * 3600);
+  X("now+1d", "03:00:00", 0, 1, 24 * 3600);
 #undef DATE
+
+  /* FALL BACK at 2015-11-01 02:00:00 */
 #define DATE "20151101"
   /* at 00:59:59 */
   X("00:59-1", "00:59:59",  0, 1, 1);
@@ -97,28 +96,30 @@ void test_dst_()
   X("00:59-3", "00:59:59",  0, 1, 1 + 3600 * 3);
 
   /* at 1:00:00, take 1 */
-  X("00:59-1", "01:00:00",  0, 0, 3600 * 25 - 60);
-  X("00:59-1:01", "01:00:00",  0, 1, 60);
-  X("00:59-2", "01:00:00",  0, 1, 3600 * 2);
-  X("1-1:01", "01:00:00",  0, 1, 60);
-  X("1-2",   "01:00:00",  0, 1, 3600 * 2);
-  X("0-4",   "01:00:00",  0, 1, 3600 * 4);
-  X("0-4",   "01:00:00",  0, 1, 3600 * 4);
-  X("3-4",   "01:00:00",  0, 0, 3600 * 3);
+  X("00:59-1", "00:59:59",  1, 0, 3600 * 25 - 60);
+  X("00:59-1:01", "00:59:59",  1, 1, 60);
+  X("00:59-2", "00:59:59",  1, 1, 3600 * 2);
+  X("1-1:01", "00:59:59",  1, 1, 60);
+  X("1-2",   "00:59:59",  1, 1, 3600 * 2);
+  X("0-4",   "00:59:59",  1, 1, 3600 * 4);
+  X("0-4",   "00:59:59",  1, 1, 3600 * 4);
+  X("3-4",   "00:59:59",  1, 0, 3600 * 3);
 
   /* at 1:00:00, take 2 */
-  X("00:59-1", "01:00:00",  3600, 0, 3600 * 24 - 60);
-  X("00:59-1:01", "01:00:00",  3600, 1, 60);
-  X("00:59-2", "01:00:00",  3600, 1, 3600);
-  X("1-1:01", "01:00:00",  3600, 1, 60);
-  X("1-2",   "01:00:00",  3600, 1, 3600 * 1);
-  X("0-4",   "01:00:00",  3600, 1, 3600 * 3);
-  X("0-4",   "01:00:00",  3600, 1, 3600 * 3);
-  X("3-4",   "01:00:00",  3600, 0, 3600 * 2);
+  X("00:59-1", "00:59:59",  3601, 0, 3600 * 24 - 60);
+  X("00:59-1:01", "00:59:59",  3601, 1, 60);
+  X("00:59-2", "00:59:59",  3601, 1, 3600);
+  X("1-1:01", "00:59:59",  3601, 1, 60);
+  X("1-2",   "00:59:59",  3601, 1, 3600 * 1);
+  X("0-4",   "00:59:59",  3601, 1, 3600 * 3);
+  X("0-4",   "00:59:59",  3601, 1, 3600 * 3);
+  X("3-4",   "00:59:59",  3601, 0, 3600 * 2);
 
   /* at 2:00:00 */
   X("1-1:01", "02:00:00",   0,  0, 3600 * 23);
 
+  X("now+1d", "00:59:59", 0, 1, 25 * 3600);
+  X("now+1d", "02:00:00", 0, 1, 24 * 3600);
 #undef DATE
 #undef X
 #undef IN

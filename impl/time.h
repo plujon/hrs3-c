@@ -18,6 +18,7 @@ int time_cmp(const a_time *a, const a_time *b);
 int time_diff(const a_time *later, const a_time *earlier);
 bool time_precedes(const a_time *earlier, const a_time *later);
 void time_incr(a_time *t, int sec);
+void time_incr_days(a_time *t, int days);
 void time_next_day(a_time *t);
 void time_next_week(a_time *t);
 a_time time_plus(const a_time *t, int sec);
