@@ -2,6 +2,7 @@
 #define __now_c__
 
 #include "impl.h"
+#include <string.h>
 
 /*
  * now_parse_nun gobbles 1 Number and UNit designator (nun) from s,
@@ -55,15 +56,17 @@ status now_init(a_now_range *now_range, const char *s, size_t len)
     now_range = &dummy_;
   now_range->seconds = 0;
   now_range->days = 0;
-  if (!s) return NO;
-  if (len < 6) return NO; /* now+1s */
-  if ('n' != *s++ ||
-      'o' != *s++ ||
-      'w' != *s++ ||
-      '+' != *s++)
-    return NO;
-  len -= 4;
-  return now_parse_nuns(now_range, s, len);
+  if (!s || 0 == len) return NO;
+  if (4 < len && 0 == strncmp("now-", s, 4)) {
+    s += 4;
+    len -= 4;
+  }
+  if (4 < len && 0 == strncmp("now+", s, 4)) {
+    s += 4;
+    len -= 4;
+    return now_parse_nuns(now_range, s, len);
+  }
+  return NO;
 }
 
 void now_destroy(a_now_range *now_range)
@@ -87,7 +90,6 @@ void now_add_to_schedule(const a_now_range *now_range, const a_time *time, struc
 }
 
 #if RUN_TESTS
-#include <string.h>
 void test_now_init()
 {
 #define X(S, SECS)                                                    \
@@ -104,6 +106,7 @@ void test_now_init()
   X("now+1h1m1s",  3661);
   X("now+100h",  360000);
   X("now+1s1m1s",  62); /* undocumented feature */
+  X("now-now+1s",  1);
 #undef X
 #define BAD(S)                                                        \
   do {                                                                \
@@ -115,6 +118,10 @@ void test_now_init()
   BAD("now+");
   BAD("now+1");
   BAD("now+s");
+  BAD("now-");
+  BAD("now-now");
+  BAD("now-now+");
+  BAD("now-now+1");
 #undef BAD
 }
 

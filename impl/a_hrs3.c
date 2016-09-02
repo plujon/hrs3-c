@@ -9,7 +9,7 @@ a_hrs3_kind hrs3_kind(const char *s)
   if (!s) return Invalid;
   const char *dash = strchr(s, '-');
   if (!dash) {
-    if ('n' == s[0] && 'o' == s[1] && 'w' == s[2] && '+' == s[3])
+    if ('n' == s[0] && 'o' == s[1] && 'w' == s[2])
       return Now;
     return Invalid;
   }
