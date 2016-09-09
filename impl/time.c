@@ -338,6 +338,21 @@ const a_time *time_now()
   return &now;
 }
 
+#if _WIN32
+PRE_INIT(cygwin_tz_fix)
+{
+  // http://cygwin.1069669.n5.nabble.com/Re-PATCH-Setting-TZ-may-break-time-in-non-Cygwin-programs-tt90762.html
+  const char *tz = getenv("TZ");
+  if (!tz || strlen(tz) < 5)
+    return;
+  if ('0' <= tz[3] && tz[3] <= '9')
+    return;
+  if ('0' <= tz[4] && tz[4] <= '9' && ('-' == tz[3] || '+' == tz[3]))
+    return;
+  _putenv("TZ=");
+}
+#endif
+
 #if RUN_TESTS
 static void test_time_()
 {
