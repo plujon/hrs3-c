@@ -85,6 +85,12 @@ a_remaining_result hrs3_remaining(a_hrs3 *hrs3, const a_time *t)
   a_remaining_result result = schedule_remaining(schedule, t);
   schedule_destroy(schedule);
   if (!result.time_is_in_schedule && 0 == result.seconds) {
+    /*
+     * t occurs after all ranges in schedule.  Look forward to the
+     * next day or week to calculate the remaining result.  Take care
+     * to handle time ranges that start at midnight on the next day or
+     * week.
+     */
     a_time next_time_ = time_clone(t), *next_time = &next_time_;
     if (Daily == hrs3->kind)
       time_next_day(next_time);
@@ -92,9 +98,12 @@ a_remaining_result hrs3_remaining(a_hrs3 *hrs3, const a_time *t)
       time_next_week(next_time);
     else
       return result;
-    result = hrs3_remaining(hrs3, next_time);
-    result.time_is_in_schedule = false;
-    result.seconds += time_diff(next_time, t);
+    a_remaining_result next_result = hrs3_remaining(hrs3, next_time);
+    if (next_result.time_is_in_schedule)
+      /* The shift starts at the very beginning of the next day or week. */
+      result.seconds = time_diff(next_time, t);
+    else
+      result.seconds = time_diff(next_time, t) + next_result.seconds;
   }
   return result;
 }

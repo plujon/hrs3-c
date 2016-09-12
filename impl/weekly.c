@@ -194,6 +194,8 @@ static void test_weekly_remaining()
   IN("U1-2&3-4.M6-7&8-9",    0,  3,  0,  0,  3600);
   IN("U1-2&3-4.M6-7&8-9",    1,  6,  0,  0,  3600);
   IN("U1-2&3-4.M6-7&8-9",    1,  8,  0,  0,  3600);
+  IN("UMTWRFA0-2359",        0,  0,  0,  0,  3600 * 24 - 60);
+  IN("MTWRFAU0-2359",        0,  0,  0,  0,  3600 * 24 - 60);
 #undef IN
 #define OUT(hrsss, wday, h, m, s, seconds)                            \
   if (thwr_aux(hrsss, wday, h, m, s, 1, 0, seconds)) TFAIL()
@@ -209,6 +211,8 @@ static void test_weekly_remaining()
   OUT("U1-2&3-4.M6-7&8-9",    1,  7,  0,  0,  3600);
   OUT("U1-2&3-4.M6-7&8-9",    1,  7, 59, 59,     1);
   OUT("U1-2&3-4.M6-7&8-9",    1,  9,  0,  0, 3600 * 24 * 6 - 3600 * 8);
+  OUT("UMTWRFA0000-2359",     6, 23, 59, 59,     1);
+  OUT("MTWRFAU0-2359",        6, 23, 59, 59,     1);
 #undef OUT
 #define BAD(hrsss) do {                                                 \
     a_time t = time_clone(time_now());                                \
