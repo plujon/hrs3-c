@@ -7,8 +7,12 @@ typedef int status;
 #include "impl/test.h"
 #include "impl/time.h"
 #include "impl/os.h"
+#ifndef RUN_TESTS
 #define RUN_TESTS 1
+#endif
+#ifndef while_0
 #define while_0 while ((void)0,0)
+#endif
 #include <iostream>
 
 class AggTime {
@@ -123,7 +127,6 @@ static struct TestHrs3 {
     cout << hrs3.remainingOut(1473577140) << endl;
   }
 } x;
-
 #endif /* RUN_TESTS */
 
 /*
