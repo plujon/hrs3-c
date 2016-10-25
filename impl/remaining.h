@@ -10,6 +10,6 @@ typedef struct a_remaining_result {
 } a_remaining_result;
 
 a_remaining_result remaining_result(int is_in_schedule, int seconds);
-a_remaining_result remaining_invalid();
+a_remaining_result remaining_invalid(void);
 
 #endif /* __remaining_h__ */

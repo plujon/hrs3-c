@@ -4,7 +4,7 @@
 #include "impl.h"
 #include <string.h>
 
-a_time_range time_range_empty()
+a_time_range time_range_empty(void)
 {
   static a_time_range x;
   return x;

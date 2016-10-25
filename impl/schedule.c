@@ -6,13 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-static a_schedule schedule_empty()
+static a_schedule schedule_empty(void)
 {
   static a_schedule empty_schedule;
   return empty_schedule;
 }
 
-a_schedule *schedule_create()
+a_schedule *schedule_create(void)
 {
   a_schedule *schedule = malloc(sizeof(a_schedule));
   schedule_init(schedule);

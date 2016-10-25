@@ -289,7 +289,7 @@ int days_in_mon(int nmon, int nyear)
   return 0;
 }
 
-size_t time_string_length()
+size_t time_string_length(void)
 {
   return sizeof("CCYYMMDDHHMMSS") - 1; /* 14 */
 }

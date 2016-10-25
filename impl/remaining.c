@@ -9,7 +9,7 @@ a_remaining_result remaining_result(int is_in_schedule, int seconds)
   return result;
 }
 
-a_remaining_result remaining_invalid()
+a_remaining_result remaining_invalid(void)
 {
   a_remaining_result result = { 0, 0, 0 };
   return result;

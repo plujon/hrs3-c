@@ -34,6 +34,6 @@ bool time_whms(a_time *t, int wday, int hour, int min, int sec);
 bool time_ymdhms(a_time *t, int year, int mon, int mday, int hour, int min, int sec);
 status time_parse(a_time *time, const char *s, size_t len);
 size_t time_to_s(const a_time *t, char *buffer);
-const a_time *time_now();
+const a_time *time_now(void);
 
 #endif /* __time_h__ */

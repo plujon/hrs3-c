@@ -11,7 +11,7 @@ typedef struct a_military_range {
   a_military_time stop;
 } a_military_range;
 
-a_military_time military_midnight();
+a_military_time military_midnight(void);
 int military_time_cmp(const a_military_time *a, const a_military_time *b);
 int military_time_diff(const a_military_time *later, const a_military_time *prior);
 size_t military_time_to_s(const a_military_time *time, char *buffer);
