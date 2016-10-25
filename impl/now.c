@@ -69,11 +69,6 @@ status now_init(a_now_range *now_range, const char *s, size_t len)
   return NO;
 }
 
-void now_destroy(a_now_range *now_range)
-{
-  return;
-}
-
 void now_to_time_range(const a_now_range *now_range, const a_time *time, struct a_time_range *range)
 {
   time_range_init(range, time, 0);

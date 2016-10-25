@@ -130,7 +130,7 @@ void hrs3_destroy(a_hrs3 *hrs3)
   case Daily: day_destroy(&hrs3->day); break;
   case Weekly: week_destroy(&hrs3->week); break;
   case Raw: break;
-  case Now: now_destroy(&hrs3->now_range); break;
+  case Now: break;
   default: break;
   }
   hrs3->kind = Invalid;
