@@ -2,7 +2,7 @@
 #define __main_c__
 
 #if RUN_TESTS
-int main()
+int main(void)
 {
   return 0;
 }

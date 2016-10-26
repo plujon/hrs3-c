@@ -6,10 +6,9 @@
 #include <time.h>
 
 #if RUN_TESTS
-
 static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time);
 
-void test_raw_remaining()
+void test_raw_remaining(void)
 {
 #define X(hrs3, ymdhms, is_in_schedule, secs) do {                      \
     a_time _t, *t = &_t;                                                \

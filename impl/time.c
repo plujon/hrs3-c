@@ -354,13 +354,13 @@ PRE_INIT(cygwin_tz_fix)
 #endif
 
 #if RUN_TESTS
-static void test_time_()
+static void test_time_(void)
 {
   a_time t1;
   time_init(&t1, time(0));
 }
 
-static void test_time_ymdhms()
+static void test_time_ymdhms(void)
 {
   a_time t;
   time_t now = time(0);
@@ -382,7 +382,7 @@ static void test_time_ymdhms()
 #undef X
 }
 
-static void test_time_whms()
+static void test_time_whms(void)
 {
   a_time t_ = time_clone(time_now()), *t = &t_;
 #define X(wday, hour, min, sec) do {                                  \
@@ -402,7 +402,7 @@ static void test_time_whms()
 #undef X
 }
 
-static void test_time_parse()
+static void test_time_parse(void)
 {
   a_time t_, *t = &t_;
 #define X(S) do {                                                     \
@@ -415,7 +415,7 @@ static void test_time_parse()
 #undef X
 }
 
-static void test_is_leap_year()
+static void test_is_leap_year(void)
 {
 #define X(yn, nyear)                                                  \
   if (yn != is_leap_year(nyear)) TFAIL()

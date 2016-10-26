@@ -73,7 +73,7 @@ void remove_char(char *s, char c)
 }
 
 #if RUN_TESTS
-void test_beginning_of_day()
+void test_beginning_of_day(void)
 {
   a_time t = beginning_of_day(time_now());
   const struct tm *tm = time_tm(&t);
@@ -84,7 +84,7 @@ void test_beginning_of_day()
   if (tm->tm_wday != now_tm->tm_wday) TFAIL();
 }
 
-void test_beginning_of_week()
+void test_beginning_of_week(void)
 {
   a_time t = beginning_of_week(time_now());
   const const struct tm *tm = time_tm(&t);

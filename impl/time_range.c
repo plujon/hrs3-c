@@ -109,13 +109,13 @@ a_remaining_result time_range_remaining(a_time_range *range, a_time *t)
 }
 
 #if RUN_TESTS
-void test_time_range_init()
+void test_time_range_init(void)
 {
   a_time_range range;
   time_range_init(&range, time_now(), 10);
 }
 
-void test_time_range_contains()
+void test_time_range_contains(void)
 {
   const a_time *start = time_now();
   a_time prior = time_clone(start); time_incr(&prior, -10);
@@ -130,7 +130,7 @@ void test_time_range_contains()
   if ( time_range_contains(&range, &after)) TFAIL();
 }
 
-void test_time_range_merge()
+void test_time_range_merge(void)
 {
   const a_time *now = time_now();
   a_time later = time_clone(now); time_incr(&later, 60);
@@ -151,7 +151,7 @@ char *time_range_to_s_dup(a_time_range *range)
   return strdup(buffer);
 }
 
-void test_time_range_parse()
+void test_time_range_parse(void)
 {
   a_time_range range;
 #define XX(x, y) do {                                          \

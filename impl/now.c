@@ -85,7 +85,7 @@ void now_add_to_schedule(const a_now_range *now_range, const a_time *time, struc
 }
 
 #if RUN_TESTS
-void test_now_init()
+void test_now_init(void)
 {
 #define X(S, SECS)                                                    \
   do {                                                                \
@@ -120,7 +120,7 @@ void test_now_init()
 #undef BAD
 }
 
-void test_now_add_to_schedule()
+void test_now_add_to_schedule(void)
 {
   const a_time *now = time_now();
   char buffer[sizeof("20160902120000-20160902123000")];

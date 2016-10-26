@@ -3,13 +3,13 @@
 
 #if _WIN32
   #pragma section(".CRT$XCU", read)
-#define PRE_INIT(f)                                              \
-  static void f();                                               \
-  __declspec(allocate(".CRT$XCU")) void (*f##_preinit)() = f;    \
-  static void f()
+#define PRE_INIT(f)                                                   \
+  static void f(void);                                                \
+  __declspec(allocate(".CRT$XCU")) void (*f##_preinit)(void) = f;     \
+  static void f(void)
 #else
 #define PRE_INIT(f)                          \
-  static void  __attribute__((constructor)) f()
+  static void  __attribute__((constructor)) f(void)
 #endif
 
 #if _WIN32

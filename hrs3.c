@@ -63,7 +63,7 @@ int hrs3_remaining_out(const char *hrsss, time_t t)
 
 #if RUN_TESTS
 
-int test_hrs3_remaining_in()
+int test_hrs3_remaining_in(void)
 {
   struct tm ymdhms;
   time_t t = time(0);
@@ -87,7 +87,7 @@ int test_hrs3_remaining_in()
   return OK;
 }
 
-int test_hrs3_remaining_out()
+int test_hrs3_remaining_out(void)
 {
   struct tm ymdhms;
   time_t t = time(0);

@@ -191,7 +191,7 @@ void day_add_to_schedule(const a_day *day, const a_time *t, a_schedule *schedule
 
 static a_remaining_result hrs3_remaining_(const char *hrsss, time_t time);
 
-void test_day_init()
+void test_day_init(void)
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \
@@ -219,7 +219,7 @@ void test_day_init()
 #undef BAD
 }
 
-void test_day_merge()
+void test_day_merge(void)
 {
 #define X(A, B, AB)                                             \
   do {                                                          \
@@ -236,7 +236,7 @@ void test_day_merge()
 #undef X
 }
 
-void test_daily_remaining()
+void test_daily_remaining(void)
 {
 #define X(x, h, m, s, is_in_schedule, secs)                             \
   do {                                                                  \

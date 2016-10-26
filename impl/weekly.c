@@ -139,7 +139,7 @@ void week_add_to_schedule(const a_week *week, const a_time *t, a_schedule *sched
 }
 
 #if RUN_TESTS
-static void test_gobble_days()
+static void test_gobble_days(void)
 {
 #define X(S, LEN, MASK) do {                            \
     a_day_mask mask;                                    \
@@ -180,7 +180,7 @@ static int thwr_aux(const char *hrsss,
   return NO;
 }
 
-static void test_weekly_remaining()
+static void test_weekly_remaining(void)
 {
 #define IN(hrsss, wday, h, m, s, seconds)                             \
   if (thwr_aux(hrsss, wday, h, m, s, 1, 1, seconds)) TFAIL()

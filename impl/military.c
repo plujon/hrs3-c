@@ -298,7 +298,7 @@ bool military_range_overlaps_or_abuts(const a_military_range *a, const a_militar
 }
 
 #if RUN_TESTS
-void test_military_time_cmp()
+void test_military_time_cmp(void)
 {
 #define X(ret, h1, m1, h2, m2)                          \
   do {                                                  \
@@ -314,7 +314,7 @@ void test_military_time_cmp()
 #undef X
 }
 
-void test_military_range_contains()
+void test_military_range_contains(void)
 {
 #define X(RET, RANGE_S, TIME_S)                                      \
   do {                                                               \
@@ -333,7 +333,7 @@ void test_military_range_contains()
 #undef X
 }
 
-void test_military_parse_time()
+void test_military_parse_time(void)
 {
   a_military_time mt;
 #define X(ret, x, h, m)                                 \
@@ -373,7 +373,7 @@ void test_military_parse_time()
 #undef X
 }
 
-void test_military_time_to_s()
+void test_military_time_to_s(void)
 {
 #define X(IN, EXPECTED) do {                                      \
     char buffer[5];                                               \
@@ -394,7 +394,7 @@ void test_military_time_to_s()
 #undef X
 }
 
-void test_military_range_to_s()
+void test_military_range_to_s(void)
 {
 #define X(IN, EXPECTED) do {                                        \
     char buffer[10];                                                \
@@ -415,7 +415,7 @@ void test_military_range_to_s()
 #undef X
 }
 
-void test_military_parse_range()
+void test_military_parse_range(void)
 {
   a_military_range mr;
 #define XX(ret,s,len,h1,m1,h2,m2) do {                          \
