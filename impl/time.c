@@ -309,7 +309,7 @@ status time_parse(a_time *out, const char *s, size_t len)
   if (hour < 0 || 24 <= hour) return NO;
   int minute = s_to_d(s, 2, 0); s += 2;
   if (minute < 0 || 60 <= minute) return NO;
-  int second = s_to_d(s, 2, 0); s += 2;
+  int second = s_to_d(s, 2, 0); /* s += 2; scan-build: dead increment */
   time_copy(out, time_now());
   if (!time_ymdhms(out, year, mon, day, hour, minute, second))
     return NO;
