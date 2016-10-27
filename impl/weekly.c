@@ -130,7 +130,7 @@ void week_add_to_schedule(const a_week *week, const a_time *t, a_schedule *sched
 {
   a_time date_ = time_clone(t), *date = &date_;
   int i = 0;
-  for (; i < (int)DIM(week->days); ++i) {
+  for (; i < (int)(DIM(week->days)); ++i) {
     const a_day *day = &week->days[i];
     if (0 == day->n_ranges) continue;
     time_whms(date, i, 0, 0, 0);
