@@ -13,13 +13,12 @@ typedef int status;
 #ifndef while_0
 #define while_0 while ((void)0,0)
 #endif
-#include <iostream>
 
 class AggTime {
 public:
   AggTime() : _timeIn(0), _timeOut(0) { }
-  void timeIn(int x) { cout << "+" << x << endl;  _timeIn += x; }
-  void timeOut(int x) { cout << "-" << x << endl; _timeOut += x; }
+  void timeIn(int x) {  _timeIn += x; }
+  void timeOut(int x) { _timeOut += x; }
   int timeIn() const { return _timeIn; }
   int timeOut() const { return _timeOut; }
 private:
@@ -69,6 +68,8 @@ bool Hrs3::validate()
 }
 
 #if RUN_TESTS
+#include <iostream>
+
 void test_hrs3_remainingIn()
 {
   struct tm ymdhms;
