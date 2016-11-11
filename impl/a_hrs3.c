@@ -137,7 +137,7 @@ void hrs3_destroy(a_hrs3 *hrs3)
 }
 
 #if RUN_TESTS
-int test_hrs3_kind()
+int test_hrs3_kind(void)
 {
 #define X(x) if (!(x)) TFAIL();
   X(Invalid == hrs3_kind(0));
