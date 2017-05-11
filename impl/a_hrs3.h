@@ -32,6 +32,7 @@ typedef struct a_hrs3 {
   };
 } a_hrs3;
 
+a_hrs3_kind hrs3_kind(const char *s);
 status hrs3_init(a_hrs3 *hrs3, const char *buffer, size_t len);
 a_remaining_result hrs3_remaining(a_hrs3 *hrs3, const a_time *t);
 void hrs3_destroy(a_hrs3 *);

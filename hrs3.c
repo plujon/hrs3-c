@@ -41,6 +41,22 @@ static a_remaining_result hrs3_remaining_(const char *hrsss_in, time_t time)
   return result;
 }
 
+const char *hrs3_kind_as_string(const char *hrsss)
+{
+  a_hrs3_kind kind = hrs3_kind(hrsss);
+  switch (kind) {
+  case Unknown: return "unknown";
+  case Invalid: return "invalid";
+  case Daily: return "daily";
+  case Weekdaily: return "weekdaily";
+  case Weekly: return "weekly";
+  case Biweekly: return "biweekly";
+  case Raw: return "raw";
+  case Now: return "now";
+  }
+  return "unknown";
+}
+
 int hrs3_remaining_in(const char *hrsss, time_t t)
 {
   a_remaining_result result = hrs3_remaining_(hrsss, t);

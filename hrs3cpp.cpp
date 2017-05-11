@@ -26,6 +26,13 @@ private:
   int _timeOut;
 };
 
+Hrs3::Hrs3(string hrsss) : _hrsss(hrsss), _inverted(false)
+{
+  if (!validate())
+    _hrsss = "";
+  _kind = hrs3_kind_as_string(hrsss.c_str());
+}
+
 int Hrs3::remainingIn(time_t t) const
 {
   return _inverted
@@ -69,6 +76,22 @@ bool Hrs3::validate()
 
 #if RUN_TESTS
 #include <iostream>
+
+void test_hrs3_kind()
+{
+#define X(s, x) do {                                                  \
+    Hrs3 hrs3(s);                                                     \
+    if (hrs3.kind() != x)                                             \
+      TFAILF("%s vs %s", hrs3.kind().c_str(), x);                     \
+  } while_0
+  X("8-9", "daily");
+  X("MTWRF8-9", "weekly");
+  X("20150516120100-20150516120200", "raw");
+  X("now+1s", "now");
+  X("P8-9", "weekdaily");
+  X("BM7-8|T8-9", "biweekly");
+#undef X
+}
 
 void test_hrs3_remainingIn()
 {
@@ -120,6 +143,7 @@ void test_hrs3_remainingInWithInversion()
 
 static struct TestHrs3 {
   TestHrs3() {
+    test_hrs3_kind();
     test_hrs3_remainingIn();
     test_hrs3_remainingInWithInversion();
     Hrs3 hrs3("UMTWRFA0-2359");
