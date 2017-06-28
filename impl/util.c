@@ -87,7 +87,7 @@ void test_beginning_of_day(void)
 void test_beginning_of_week(void)
 {
   a_time t = beginning_of_week(time_now());
-  const const struct tm *tm = time_tm(&t);
+  const struct tm *tm = time_tm(&t);
   if (tm->tm_wday) TFAIL();
   if (tm->tm_hour) TFAIL();
   if (tm->tm_min) TFAIL();
